@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { FishProvider } from './contexts/FishContext';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
+import Login from './pages/Login';
 import Register from './pages/Register';
 import MyPage from './pages/MyPage';
 
@@ -25,7 +26,8 @@ function App() {
               </MainLayout>
             } />
 
-            {/* 회원가입은 별도 페이지 유지 */}
+            {/* 로그인 및 회원가입은 별도 페이지 */}
+            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </Routes>
         </Router>

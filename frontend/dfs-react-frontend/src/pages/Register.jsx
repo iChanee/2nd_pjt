@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { getFishTypeOptions, getSpeedText, getSizeText } from '../utils/constants';
 
 const Register = () => {
     const [ formData, setFormData ] = useState( {
@@ -16,14 +17,7 @@ const Register = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const fishTypes = [
-        { value: 'goldfish', label: '금붕어', emoji: '🐠' },
-        { value: 'tropical', label: '열대어', emoji: '🐟' },
-        { value: 'shark', label: '상어', emoji: '🦈' },
-        { value: 'whale', label: '고래', emoji: '🐋' },
-        { value: 'octopus', label: '문어', emoji: '🐙' },
-        { value: 'crab', label: '게', emoji: '🦀' }
-    ];
+    const fishTypeOptions = getFishTypeOptions();
 
     const handleChange = ( e ) => {
         setFormData( {
@@ -154,8 +148,8 @@ const Register = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-3">
                             내 물고기 선택
                         </label>
-                        <div className="grid grid-cols-3 gap-2">
-                            {fishTypes.map( type => (
+                        <div className="grid grid-cols-3 gap-3">
+                            {fishTypeOptions.map( type => (
                                 <label key={type.value} className="cursor-pointer">
                                     <input
                                         type="radio"
@@ -166,11 +160,15 @@ const Register = () => {
                                         className="sr-only"
                                     />
                                     <div className={`p-3 rounded-lg border-2 text-center transition-all ${ formData.fishType === type.value
-                                            ? 'border-blue-500 bg-blue-100'
-                                            : 'border-gray-200 hover:border-gray-300'
+                                        ? 'border-blue-500 bg-blue-100'
+                                        : 'border-gray-200 hover:border-gray-300'
                                         }`}>
                                         <div className="text-2xl mb-1">{type.emoji}</div>
-                                        <div className="text-xs">{type.label}</div>
+                                        <div className="text-xs font-medium mb-1">{type.label}</div>
+                                        <div className="text-xs text-gray-500">
+                                            <div>속도: {getSpeedText( type.speed )}</div>
+                                            <div>크기: {getSizeText( type.size )}</div>
+                                        </div>
                                     </div>
                                 </label>
                             ) )}

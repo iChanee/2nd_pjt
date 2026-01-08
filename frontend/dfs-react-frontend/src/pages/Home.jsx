@@ -7,7 +7,7 @@ const Home = () => {
     const { isAuthenticated } = useAuth();
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full relative">
             {isAuthenticated ? (
                 <FishTank />
             ) : (

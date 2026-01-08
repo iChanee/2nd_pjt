@@ -82,3 +82,29 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+/* 말풍선 애니메이션 */
+@keyframes bounce-in {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.05);
+    }
+
+    70% {
+        transform: translateX(-50%) scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+.animate-bounce-in {
+    animation: bounce-in 0.5s ease-out;
+}
