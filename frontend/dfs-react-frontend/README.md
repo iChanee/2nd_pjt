@@ -1,70 +1,140 @@
-# Getting Started with Create React App
+# 🐠 Fish Tank - 어항 속 물고기 웹서비스
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+접속자들을 어항 속의 물고기로 표현하는 인터랙티브 웹서비스입니다.
 
-## Available Scripts
+## ✨ 주요 기능
 
-In the project directory, you can run:
+- **실시간 어항**: 접속자들이 물고기가 되어 어항에서 헤엄치는 모습을 실시간으로 확인
+- **다양한 물고기**: 6가지 물고기 타입 선택 가능 (금붕어, 열대어, 상어, 고래, 문어, 게)
+- **자동 애니메이션**: 물고기들이 자동으로 움직이며 생동감 있는 어항 구현
+- **사용자 관리**: 로그인/회원가입을 통한 개인화된 물고기 관리
+- **마이페이지**: 내 물고기 정보 및 어항 통계 확인
 
-### `npm start`
+## 🏗️ 프로젝트 구조
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+src/
+├── components/           # 재사용 가능한 UI 컴포넌트
+│   ├── common/          # 공통 컴포넌트 (Header, Button 등)
+│   ├── fish/            # 물고기 관련 컴포넌트
+│   └── ui/              # UI 전용 컴포넌트 (OceanBackground 등)
+├── pages/               # 페이지 컴포넌트
+│   ├── Home.jsx         # 어항 메인 화면
+│   ├── Login.jsx        # 로그인 페이지
+│   ├── Register.jsx     # 회원가입 페이지
+│   └── MyPage.jsx       # 마이페이지
+├── layouts/             # 레이아웃 컴포넌트
+│   ├── MainLayout.jsx   # 헤더 + 바디 레이아웃
+│   └── AuthLayout.jsx   # 로그인/회원가입용 레이아웃
+├── contexts/            # React Context (상태 관리)
+│   ├── AuthContext.js   # 로그인 상태 관리
+│   └── FishContext.js   # 물고기/어항 상태 관리
+├── hooks/               # 커스텀 훅
+│   ├── useAuth.js       # 인증 관련 훅
+│   └── useFish.js       # 물고기 관련 훅
+├── services/            # API 호출 관련
+│   ├── api.js           # 기본 API 설정
+│   ├── authService.js   # 인증 API
+│   └── fishService.js   # 물고기 API
+├── utils/               # 유틸리티 함수
+│   ├── constants.js     # 상수 정의
+│   └── helpers.js       # 헬퍼 함수
+└── styles/              # 스타일 파일
+    ├── global.css       # 전역 스타일
+    ├── index.css        # 기본 스타일
+    └── App.css          # 앱 스타일
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🚀 시작하기
 
-### `npm test`
+### 설치
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+cd frontend/dfs-react-frontend
+npm install
+```
 
-### `npm run build`
+### 개발 서버 실행
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+npm start
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+브라우저에서 [http://localhost:3000](http://localhost:3000)으로 접속하세요.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 빌드
 
-### `npm run eject`
+```bash
+npm run build
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🐟 물고기 타입
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| 타입 | 이모지 | 특징 |
+|------|--------|------|
+| 금붕어 | 🐠 | 기본 물고기, 중간 속도 |
+| 열대어 | 🐟 | 빠른 속도, 작은 크기 |
+| 상어 | 🦈 | 느린 속도, 큰 크기 |
+| 고래 | 🐋 | 매우 느린 속도, 매우 큰 크기 |
+| 문어 | 🐙 | 매우 빠른 속도, 중간 크기 |
+| 게 | 🦀 | 느린 속도, 작은 크기 |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🎨 주요 화면
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1. 어항 (홈페이지)
+- 실시간으로 접속자들의 물고기가 헤엄치는 모습
+- 물거품 효과와 해초 등 자연스러운 어항 환경
+- 로그인 시 자동으로 내 물고기 생성
 
-## Learn More
+### 2. 로그인/회원가입
+- 간단한 폼을 통한 사용자 인증
+- 회원가입 시 물고기 타입 선택 가능
+- 데모 모드 지원 (임시 계정)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 3. 마이페이지
+- 내 물고기 정보 및 설정
+- 물고기 타입 변경 기능
+- 어항 통계 및 활동 시간 확인
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🛠️ 기술 스택
 
-### Code Splitting
+- **Frontend**: React 19, React Router DOM
+- **Styling**: Tailwind CSS
+- **State Management**: React Context API
+- **Build Tool**: Create React App
+- **Package Manager**: npm
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 📱 반응형 디자인
 
-### Analyzing the Bundle Size
+모든 화면이 데스크톱, 태블릿, 모바일에서 최적화되어 표시됩니다.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 🔧 개발 가이드
 
-### Making a Progressive Web App
+### 새로운 물고기 타입 추가
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+1. `src/utils/constants.js`에서 `FISH_TYPES`와 `FISH_INFO` 업데이트
+2. 회원가입 및 마이페이지의 물고기 선택 옵션에 추가
 
-### Advanced Configuration
+### 새로운 페이지 추가
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. `src/pages/` 폴더에 새 컴포넌트 생성
+2. `src/App.jsx`에서 라우트 추가
+3. 필요에 따라 헤더 네비게이션 업데이트
 
-### Deployment
+### API 연동
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+현재는 로컬 스토리지를 사용한 데모 모드로 구현되어 있습니다.
+실제 백엔드 연동을 위해서는 `src/services/` 폴더의 API 서비스들을 실제 엔드포인트로 연결하세요.
 
-### `npm run build` fails to minify
+## 🎯 향후 개선 계획
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [ ] 실시간 WebSocket 연결로 물고기 동기화
+- [ ] 물고기 간 상호작용 기능
+- [ ] 어항 테마 변경 기능
+- [ ] 채팅 기능 추가
+- [ ] 물고기 레벨 시스템
+- [ ] 어항 꾸미기 기능
+
+## 📄 라이선스
+
+MIT License

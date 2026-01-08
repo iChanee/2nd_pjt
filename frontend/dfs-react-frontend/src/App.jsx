@@ -1,25 +1,36 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import OceanBackground from './components/OceanBackground';
-import Header from './tiles/Header';
+import { AuthProvider } from './contexts/AuthContext';
+import { FishProvider } from './contexts/FishContext';
+import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
-import Login from './pages/Login';
 import Register from './pages/Register';
+import MyPage from './pages/MyPage';
 
 function App() {
   return (
-    <Router>
-      <OceanBackground>
-        <div className="min-h-screen flex flex-col">
-          <Header />
+    <AuthProvider>
+      <FishProvider>
+        <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
+            {/* 메인 레이아웃 (헤더 포함) */}
+            <Route path="/" element={
+              <MainLayout>
+                <Home />
+              </MainLayout>
+            } />
+            <Route path="/mypage" element={
+              <MainLayout>
+                <MyPage />
+              </MainLayout>
+            } />
+
+            {/* 회원가입은 별도 페이지 유지 */}
             <Route path="/register" element={<Register />} />
           </Routes>
-        </div>
-      </OceanBackground>
-    </Router>
+        </Router>
+      </FishProvider>
+    </AuthProvider>
   );
 }
 

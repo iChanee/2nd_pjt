@@ -1,24 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './css/index.css';
+import './styles/global.css';
+import './styles/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import Header from './tiles/Header';
-import { SessionProvider } from './contexts/SessionContext';
-import OceanBackground from './components/OceanBackground';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot( document.getElementById( 'root' ) );
 root.render(
   <React.StrictMode>
-    <OceanBackground>
-
-    <SessionProvider> 
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <App />
-      </div>
-    </SessionProvider>
-    </OceanBackground>
+    <App />
   </React.StrictMode>
 );
 
