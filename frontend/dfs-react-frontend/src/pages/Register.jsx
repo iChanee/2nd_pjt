@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getFishTypeOptions, getSpeedText, getSizeText } from '../utils/constants';
+import { getFishTypeOptions, getSpeedText, getSizeText, loadFishTypes } from '../utils/constants';
 
 const Register = () => {
     const [ formData, setFormData ] = useState( {
@@ -13,11 +13,28 @@ const Register = () => {
     } );
     const [ isLoading, setIsLoading ] = useState( false );
     const [ error, setError ] = useState( '' );
+    const [ fishTypeOptions, setFishTypeOptions ] = useState( [] );
 
-    const { login } = useAuth();
+    const { register } = useAuth();
     const navigate = useNavigate();
 
-    const fishTypeOptions = getFishTypeOptions();
+    // 컴포넌트 마운트 시 물고기 타입 로드
+    useEffect( () => {
+        const loadOptions = async () => {
+            try {
+                await loadFishTypes();
+                const options = await getFishTypeOptions();
+                setFishTypeOptions( options );
+            } catch ( error ) {
+                console.error( 'Failed to load fish types:', error );
+                // 기본 옵션 사용
+                setFishTypeOptions( [
+                    { value: 'goldfish', label: '금붕어', emoji: '🐠', speed: 1.2, size: 'medium' }
+                ] );
+            }
+        };
+        loadOptions();
+    }, [] );
 
     const handleChange = ( e ) => {
         setFormData( {
@@ -45,20 +62,17 @@ const Register = () => {
         }
 
         try {
-            // TODO: 실제 API 호출로 대체
-            // 임시 회원가입 로직
-            const userData = {
-                id: Date.now(),
+            const registerData = {
                 name: formData.name,
                 email: formData.email,
-                fishType: formData.fishType,
-                joinedAt: new Date().toISOString()
+                password: formData.password,
+                fishType: formData.fishType
             };
 
-            login( userData );
+            await register( registerData );
             navigate( '/' );
         } catch ( err ) {
-            setError( '회원가입에 실패했습니다. 다시 시도해주세요.' );
+            setError( err.message || '회원가입에 실패했습니다. 다시 시도해주세요.' );
         } finally {
             setIsLoading( false );
         }

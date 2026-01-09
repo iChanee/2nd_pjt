@@ -1,4 +1,6 @@
-// 물고기 타입 상수
+import { getAllFishTypes, formatFishTypeOptions } from '../services/fishTypeService';
+
+// 물고기 타입 상수 (백워드 호환성을 위해 유지)
 export const FISH_TYPES = {
     GOLDFISH: 'goldfish',
     TROPICAL: 'tropical',
@@ -14,8 +16,8 @@ export const FISH_TYPES = {
     SHELL: 'shell'
 };
 
-// 물고기 타입별 정보
-export const FISH_INFO = {
+// 기본 물고기 정보 (API 실패 시 폴백용)
+const DEFAULT_FISH_INFO = {
     [ FISH_TYPES.GOLDFISH ]: {
         label: '금붕어',
         emoji: '🐠',
@@ -90,14 +92,75 @@ export const FISH_INFO = {
     }
 };
 
-// 물고기 타입 배열을 FISH_INFO에서 생성하는 헬퍼 함수
-export const getFishTypeOptions = () => {
-    return Object.keys( FISH_INFO ).map( fishType => ( {
+// 캐시된 물고기 정보
+let cachedFishInfo = null;
+
+// API에서 물고기 타입 정보를 가져오는 함수
+export const loadFishTypes = async () => {
+    try {
+        const fishTypes = await getAllFishTypes();
+        const formattedTypes = formatFishTypeOptions( fishTypes );
+
+        // 캐시에 저장
+        cachedFishInfo = {};
+        formattedTypes.forEach( fishType => {
+            cachedFishInfo[ fishType.typeCode ] = {
+                label: fishType.label,
+                emoji: fishType.emoji,
+                speed: fishType.speed,
+                size: fishType.size
+            };
+        } );
+
+        return cachedFishInfo;
+    } catch ( error ) {
+        console.warn( 'Failed to load fish types from API, using default:', error );
+        cachedFishInfo = DEFAULT_FISH_INFO;
+        return DEFAULT_FISH_INFO;
+    }
+};
+
+// 물고기 정보 가져오기 (캐시 우선, 없으면 기본값)
+export const getFishInfo = ( fishType ) => {
+    const fishInfo = cachedFishInfo || DEFAULT_FISH_INFO;
+    return fishInfo[ fishType ] || DEFAULT_FISH_INFO[ FISH_TYPES.GOLDFISH ];
+};
+
+// 물고기 타입 옵션 배열 가져오기
+export const getFishTypeOptions = async () => {
+    try {
+        if ( !cachedFishInfo ) {
+            await loadFishTypes();
+        }
+
+        return Object.keys( cachedFishInfo ).map( fishType => ( {
+            value: fishType,
+            label: cachedFishInfo[ fishType ].label,
+            emoji: cachedFishInfo[ fishType ].emoji,
+            speed: cachedFishInfo[ fishType ].speed,
+            size: cachedFishInfo[ fishType ].size
+        } ) );
+    } catch ( error ) {
+        console.warn( 'Failed to get fish type options:', error );
+        return Object.keys( DEFAULT_FISH_INFO ).map( fishType => ( {
+            value: fishType,
+            label: DEFAULT_FISH_INFO[ fishType ].label,
+            emoji: DEFAULT_FISH_INFO[ fishType ].emoji,
+            speed: DEFAULT_FISH_INFO[ fishType ].speed,
+            size: DEFAULT_FISH_INFO[ fishType ].size
+        } ) );
+    }
+};
+
+// 동기적으로 물고기 타입 옵션 가져오기 (캐시된 데이터만)
+export const getFishTypeOptionsSync = () => {
+    const fishInfo = cachedFishInfo || DEFAULT_FISH_INFO;
+    return Object.keys( fishInfo ).map( fishType => ( {
         value: fishType,
-        label: FISH_INFO[ fishType ].label,
-        emoji: FISH_INFO[ fishType ].emoji,
-        speed: FISH_INFO[ fishType ].speed,
-        size: FISH_INFO[ fishType ].size
+        label: fishInfo[ fishType ].label,
+        emoji: fishInfo[ fishType ].emoji,
+        speed: fishInfo[ fishType ].speed,
+        size: fishInfo[ fishType ].size
     } ) );
 };
 
@@ -137,12 +200,12 @@ export const ANIMATION_CONFIG = {
     },
     FISH_MOVE_DISTANCE: {
         X: 8,  // 더 큰 움직임
-        Y: 6   // 더 큰 움직임
+        Y: 8   // Y축 움직임을 X축과 동일하게 증가
     },
     BOUNDARIES: {
         X_MIN: 5,   // 경계를 더 여유롭게
         X_MAX: 95,  // 경계를 더 여유롭게
         Y_MIN: 10,  // 경계를 더 여유롭게
-        Y_MAX: 80   // Y 최대값을 80%로 더 줄임
+        Y_MAX: 85   // Y 최대값을 85%로 증가
     }
 };

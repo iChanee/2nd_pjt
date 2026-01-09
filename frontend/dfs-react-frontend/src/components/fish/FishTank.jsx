@@ -1,15 +1,74 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useFish } from '../../contexts/FishContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useChat } from '../../contexts/ChatContext';
 import { getFishEmoji } from '../../utils/helpers';
 import Fish from './Fish';
 import OceanBackground from '../ui/OceanBackground';
 
 const FishTank = () => {
-    const { fishes, addFish, removeFish, updateFishPosition, addFishMessage, isFeeding, logoutAnimation } = useFish();
+    const { fishes, addFish, removeFish, updateFishPosition, addFishMessage, isFeeding, isLoading, logoutAnimation } = useFish();
     const { user, isAuthenticated } = useAuth();
+    const { messages, sendMessage } = useChat();
     const [ chatMessage, setChatMessage ] = useState( '' );
     const [ foodParticles, setFoodParticles ] = useState( [] ); // 먹이 파티클 상태
+    const [ processedMessageIds, setProcessedMessageIds ] = useState( new Set() ); // 처리된 메시지 ID 추적
+
+    // 채팅 메시지를 물고기 말풍선으로 표시 (중복 처리 방지)
+    useEffect( () => {
+        if ( messages.length > 0 ) {
+            const latestMessage = messages[ messages.length - 1 ];
+
+            // 이미 처리된 메시지인지 확인
+            if ( processedMessageIds.has( latestMessage.id ) ) {
+                return;
+            }
+
+            console.log( '� 새 채팅 메시지 감지:', latestMessage );
+            console.log( '💬 현재 물고기 목록:', fishes.map( f => ( { id: f.id, userId: f.userId, name: f.name } ) ) );
+
+            // 해당 사용자의 물고기 찾기
+            const senderFish = fishes.find( fish => fish.userId === latestMessage.userId );
+            if ( senderFish ) {
+                console.log( '🐠 메시지 발신자 물고기 찾음:', senderFish );
+                // 물고기 말풍선에 메시지 표시
+                addFishMessage( senderFish.id, latestMessage.message );
+
+                // 처리된 메시지 ID 추가
+                setProcessedMessageIds( prev => new Set( prev ).add( latestMessage.id ) );
+            } else {
+                console.log( '❌ 메시지 발신자 물고기를 찾을 수 없음:', {
+                    senderId: latestMessage.userId,
+                    senderName: latestMessage.userName,
+                    availableFishes: fishes.map( f => ( { id: f.id, userId: f.userId, name: f.name } ) )
+                } );
+
+                // 물고기 데이터를 다시 가져와서 매칭 재시도
+                console.log( '🔄 물고기 데이터 새로고침 후 재시도' );
+                setTimeout( () => {
+                    const retryFish = fishes.find( fish => fish.userId === latestMessage.userId );
+                    if ( retryFish ) {
+                        console.log( '🐠 재시도로 물고기 찾음:', retryFish );
+                        addFishMessage( retryFish.id, latestMessage.message );
+
+                        // 처리된 메시지 ID 추가
+                        setProcessedMessageIds( prev => new Set( prev ).add( latestMessage.id ) );
+                    }
+                }, 1000 );
+            }
+        }
+    }, [ messages, fishes, addFishMessage ] );
+
+    // 물고기 데이터 디버깅
+    useEffect( () => {
+        // console.log( '🐠 FishTank - 물고기 데이터 변경:', {
+        //     fishCount: fishes.length,
+        //     fishes: fishes,
+        //     isLoading: isLoading,
+        //     isAuthenticated: isAuthenticated,
+        //     user: user
+        // } );
+    }, [ fishes, isLoading, isAuthenticated, user ] );
 
     // 먹이주기 이펙트
     useEffect( () => {
@@ -49,8 +108,8 @@ const FishTank = () => {
         }
     }, [ isFeeding ] );
 
-    // 채팅 전송 함수
-    const handleSendMessage = ( e ) => {
+    // 채팅 전송 함수 (물고기 말풍선으로 표시)
+    const handleSendMessage = async ( e ) => {
         e.preventDefault();
         console.log( '채팅 전송 시도:', { chatMessage, isAuthenticated, user } );
 
@@ -59,44 +118,26 @@ const FishTank = () => {
             return;
         }
 
-        // 현재 사용자의 물고기 찾기
-        const userFish = fishes.find( fish => fish.userId === user.id );
-        console.log( '사용자 물고기 찾기:', { userFish, fishes, userId: user.id } );
-        console.log( '모든 물고기 ID들:', fishes.map( f => ( { id: f.id, userId: f.userId, name: f.name } ) ) );
-
-        if ( userFish ) {
-            console.log( '말풍선 추가 시도:', userFish.id, chatMessage.trim() );
-            addFishMessage( userFish.id, chatMessage.trim() );
+        try {
+            // 공유 채팅 시스템으로 메시지 전송
+            await sendMessage( chatMessage.trim() );
             setChatMessage( '' ); // 입력창 초기화
-
-            // 강제로 테스트 메시지도 추가
-            console.log( '테스트: fishMessages 직접 확인' );
-        } else {
-            console.log( '사용자 물고기를 찾을 수 없음' );
-            // 디버깅을 위해 첫 번째 물고기에 메시지 추가
-            if ( fishes.length > 0 ) {
-                console.log( '테스트: 첫 번째 물고기에 메시지 추가', fishes[ 0 ].id );
-                addFishMessage( fishes[ 0 ].id, chatMessage.trim() );
-                setChatMessage( '' );
-            }
+            console.log( '✅ 채팅 메시지 전송 성공 - 물고기 말풍선으로 표시됨' );
+        } catch ( error ) {
+            console.error( '❌ 채팅 전송 실패:', error );
+            alert( '메시지 전송에 실패했습니다: ' + error.message );
         }
     };
 
-    // 사용자가 로그인했을 때 물고기 추가 (한 번만 실행되도록 수정)
+    // 사용자가 로그인했을 때는 AuthContext에서 자동으로 어항 입장 처리
+    // FishContext에서 주기적으로 서버 데이터를 가져오므로 별도 처리 불필요
     useEffect( () => {
-        if ( isAuthenticated && user && user.id ) {
-            // 이미 해당 사용자의 물고기가 있는지 확인
-            const existingFish = fishes.find( fish => fish.userId === user.id );
-            if ( !existingFish ) {
-                console.log( '로그인 감지, 물고기 추가 시도:', user );
-                addFish( {
-                    userId: user.id,
-                    name: user.name || user.email,
-                    type: user.fishType || 'goldfish'
-                } );
-            }
+        // 로그인 상태 변경 시 즉시 데이터 새로고침
+        if ( isAuthenticated && user ) {
+            // fetchAllFishes는 FishContext에서 자동으로 처리됨
+            console.log( '로그인 감지, 서버 데이터 새로고침 예정' );
         }
-    }, [ isAuthenticated, user?.id ] ); // addFish와 user 전체 객체 제거
+    }, [ isAuthenticated, user?.id ] );
 
     // 로그아웃 시 물고기 제거 (단순화)
     useEffect( () => {
@@ -182,13 +223,26 @@ const FishTank = () => {
                 )}
 
                 {/* 물고기가 없을 때 메시지 */}
-                {fishes.length === 0 && (
+                {fishes.length === 0 && !isLoading && (
                     <div className="absolute inset-0 flex items-center justify-center">
                         <div className="text-center text-white bg-black bg-opacity-50 p-6 rounded-lg">
                             <div className="text-4xl mb-4">🌊</div>
                             <h3 className="text-xl font-bold mb-2">텅 빈 어항</h3>
                             <p className="text-gray-300">
                                 로그인하여 물고기가 되어 어항에 참여해보세요!
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* 로딩 상태 */}
+                {isLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center text-white bg-black bg-opacity-50 p-6 rounded-lg">
+                            <div className="text-4xl mb-4 animate-spin">🐠</div>
+                            <h3 className="text-xl font-bold mb-2">어항 로딩 중...</h3>
+                            <p className="text-gray-300">
+                                물고기들을 불러오고 있습니다
                             </p>
                         </div>
                     </div>
@@ -218,7 +272,7 @@ const FishTank = () => {
                         type="text"
                         value={chatMessage}
                         onChange={( e ) => setChatMessage( e.target.value )}
-                        placeholder={isAuthenticated ? "물고기에게 말을 걸어보세요... 💬" : "로그인 후 채팅 가능"}
+                        placeholder={isAuthenticated ? "물고기 말풍선으로 채팅해보세요... 💬" : "로그인 후 채팅 가능"}
                         disabled={!isAuthenticated}
                         className="flex-1 px-4 py-3 bg-white border-2 border-blue-400 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed shadow-lg text-sm"
                     />
@@ -233,7 +287,11 @@ const FishTank = () => {
 
                 {/* 상태 표시 */}
                 <div className="text-xs text-center mt-2 bg-black bg-opacity-70 text-white rounded px-2 py-1">
-                    {isAuthenticated ? `✅ ${ user?.name }님 로그인됨` : '❌ 로그인이 필요합니다'}
+                    {isAuthenticated ? (
+                        <span>✅ {user?.name}님 로그인됨 | 🐠 {fishes.length}마리 헤엄치는 중</span>
+                    ) : (
+                        <span>❌ 로그인이 필요합니다</span>
+                    )}
                 </div>
             </div>
         </div>

@@ -27,24 +27,24 @@ const LoginForm = () => {
         setError( '' );
 
         try {
-            // TODO: 실제 API 호출로 대체
-            // 임시 로그인 로직
-            if ( formData.email && formData.password ) {
-                const userData = {
-                    id: Date.now(),
-                    email: formData.email,
-                    name: formData.email.split( '@' )[ 0 ],
-                    fishType: 'goldfish',
-                    joinedAt: new Date().toISOString()
-                };
-
-                login( userData );
-                // Home에서 조건부 렌더링하므로 navigate 불필요
-            } else {
-                setError( '이메일과 비밀번호를 입력해주세요.' );
-            }
+            await login( formData );
+            // Home에서 조건부 렌더링하므로 navigate 불필요
         } catch ( err ) {
-            setError( '로그인에 실패했습니다. 다시 시도해주세요.' );
+            const errorMessage = err.message || '로그인에 실패했습니다. 다시 시도해주세요.';
+
+            // 미가입 사용자인 경우 회원가입 안내
+            if ( errorMessage.includes( '가입되지 않은 이메일' ) || errorMessage.includes( '회원가입' ) ) {
+                const shouldRegister = window.confirm(
+                    '가입되지 않은 이메일입니다.\n회원가입 페이지로 이동하시겠습니까?'
+                );
+
+                if ( shouldRegister ) {
+                    navigate( '/register' );
+                    return;
+                }
+            }
+
+            setError( errorMessage );
         } finally {
             setIsLoading( false );
         }

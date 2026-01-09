@@ -6,16 +6,24 @@ const Fish = ( { fish } ) => {
     // 물고기 정보 가져오기
     const fishInfo = getFishInfo( fish.type );
 
-    // 완전히 독립적인 위치 관리
+    // 완전히 독립적인 위치 관리 (px 기반)
     const [ position, setPosition ] = useState( {
-        x: Math.random() * 80 + 10,
-        y: Math.random() * 80 + 10
+        x: Math.random() * 80 + 10, // % 기반 (X축)
+        y: Math.random() * 400 + 100 // px 기반 (Y축)
     } );
     const [ direction, setDirection ] = useState( 1 );
     const [ isDragging, setIsDragging ] = useState( false );
     const [ dragOffset, setDragOffset ] = useState( { x: 0, y: 0 } );
     const fishRef = useRef( null );
     const { fishMessages } = useFish();
+
+    // 물고기별 고유한 성격 특성 (컴포넌트 생성 시 한 번만 설정)
+    const [ fishPersonality ] = useState( () => ( {
+        aggressiveness: Math.random(), // 0-1: 움직임의 활발함
+        verticalPreference: Math.random() - 0.5, // -0.5~0.5: 위아래 선호도
+        horizontalPreference: Math.random() - 0.5, // -0.5~0.5: 좌우 선호도
+        restProbability: Math.random() * 0.3 // 0-0.3: 가만히 있을 확률
+    } ) );
 
     const currentMessage = fishMessages[ fish.id ];
 
@@ -30,10 +38,15 @@ const Fish = ( { fish } ) => {
         }
     };
 
-    // 움직임 간격 계산 (speed에 반비례)
+    // 움직임 간격 계산 (물고기별 개별 간격)
     const getMoveInterval = () => {
         const baseInterval = 2000; // 기본 2초
-        return Math.max( 800, baseInterval / fishInfo.speed ); // 최소 0.8초
+        const speedMultiplier = fishInfo.speed || 1;
+        const randomFactor = 0.7 + Math.random() * 0.6; // 0.7 ~ 1.3 배수
+
+        const interval = Math.max( 800, ( baseInterval / speedMultiplier ) * randomFactor );
+        console.log( `⏱️ Fish ${ fish.id } (${ fish.type }) 간격: ${ interval.toFixed( 0 ) }ms (속도: ${ speedMultiplier })` );
+        return interval;
     };
 
     // 드래그 시작
@@ -101,15 +114,27 @@ const Fish = ( { fish } ) => {
 
         const moveInterval = setInterval( () => {
             setPosition( prev => {
+                // 가끔 쉬기 (성격에 따라)
+                if ( Math.random() < fishPersonality.restProbability ) {
+                    // console.log( `� Fish ${ fish.id } 휴식 중...` );
+                    return prev; // 움직이지 않음
+                }
+
                 // 물고기 타입별 움직임 계산
                 const movement = calculateRandomMovement( fish.type );
 
-                const newPosition = {
-                    x: Math.max( 5, Math.min( 95, prev.x + movement.x ) ),
-                    y: Math.max( 5, Math.min( 95, prev.y + movement.y ) )
+                // 성격 특성 적용
+                const personalizedMovement = {
+                    x: movement.x * ( 1 + fishPersonality.aggressiveness * 0.5 ) + fishPersonality.horizontalPreference * 2,
+                    y: movement.y * ( 1 + fishPersonality.aggressiveness * 0.5 ) + fishPersonality.verticalPreference * 3
                 };
 
-                console.log( `Fish ${ fish.id } (${ fish.type }) 움직임: X ${ prev.x.toFixed( 1 ) } → ${ newPosition.x.toFixed( 1 ) }, Y ${ prev.y.toFixed( 1 ) } → ${ newPosition.y.toFixed( 1 ) }` );
+                const newPosition = {
+                    x: Math.max( 5, Math.min( 95, prev.x + personalizedMovement.x ) ), // % 기반 (X축)
+                    y: Math.max( 50, Math.min( 500, prev.y + personalizedMovement.y * 20 ) ) // px 기반 (Y축, 움직임 증폭)
+                };
+
+                // console.log( `🐠 Fish ${ fish.id } (${ fish.type }): X=${ newPosition.x.toFixed( 1 ) }%, Y=${ newPosition.y.toFixed( 0 ) }px` );
 
                 // 방향 결정
                 if ( newPosition.x > prev.x ) setDirection( 1 );
@@ -117,7 +142,7 @@ const Fish = ( { fish } ) => {
 
                 return newPosition;
             } );
-        }, getMoveInterval() ); // 물고기 타입별 다른 간격
+        }, getMoveInterval() ); // 물고기별 개별 간격
 
         return () => clearInterval( moveInterval );
     }, [ fish.id, fish.type, isDragging ] );
@@ -128,12 +153,12 @@ const Fish = ( { fish } ) => {
             className={`absolute cursor-pointer hover:scale-110 ${ isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab' }`}
             style={{
                 left: `${ position.x }%`,
-                top: `${ position.y * 4 }px`, // calc(100vh - 80px) 기준으로 조정
+                top: `${ position.y }px`, // px 기반으로 변경
                 zIndex: isDragging ? 1000 : 10,
                 transition: isDragging ? 'none' : 'all 2.5s ease-in-out',
                 userSelect: 'none',
             }}
-            title={`${ fish.name } - X: ${ position.x.toFixed( 1 ) }%, Y: ${ position.y.toFixed( 1 ) }% (${ ( position.y * 5 ).toFixed( 0 ) }px)`}
+            title={`${ fish.name } - X: ${ position.x.toFixed( 1 ) }%, Y: ${ position.y.toFixed( 0 ) }px`}
             onMouseDown={handleMouseDown}
         >
             {/* 말풍선 */}

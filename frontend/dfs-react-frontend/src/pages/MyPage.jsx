@@ -1,19 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useFish } from '../contexts/FishContext';
-import { getFishTypeOptions, getSpeedText, getSizeText } from '../utils/constants';
+import { getFishTypeOptions, getSpeedText, getSizeText, loadFishTypes } from '../utils/constants';
 
 const MyPage = () => {
-    const { user, logout, login } = useAuth();
+    const { user, logout, updateProfile } = useAuth();
     const { fishes, updateFishType } = useFish();
     const [ selectedFishType, setSelectedFishType ] = useState( user?.fishType || 'goldfish' );
     const [ isSaving, setIsSaving ] = useState( false );
     const [ saveMessage, setSaveMessage ] = useState( '' );
+    const [ fishTypeOptions, setFishTypeOptions ] = useState( [] );
 
     const myFish = fishes.find( fish => fish.userId === user?.id );
     const hasChanges = selectedFishType !== ( user?.fishType || 'goldfish' );
 
-    const fishTypeOptions = getFishTypeOptions();
+    // 컴포넌트 마운트 시 물고기 타입 로드
+    useEffect( () => {
+        const loadOptions = async () => {
+            try {
+                await loadFishTypes();
+                const options = await getFishTypeOptions();
+                setFishTypeOptions( options );
+            } catch ( error ) {
+                console.error( 'Failed to load fish types:', error );
+                // 기본 옵션 사용
+                setFishTypeOptions( [
+                    { value: 'goldfish', label: '금붕어', emoji: '🐠', speed: 1.2, size: 'medium' }
+                ] );
+            }
+        };
+        loadOptions();
+    }, [] );
+
+    // 사용자 정보가 변경되면 선택된 물고기 타입도 업데이트
+    useEffect( () => {
+        if ( user?.fishType ) {
+            setSelectedFishType( user.fishType );
+        }
+    }, [ user?.fishType ] );
 
     const handleFishTypeChange = ( newType ) => {
         setSelectedFishType( newType );
@@ -25,15 +49,10 @@ const MyPage = () => {
         setSaveMessage( '' );
 
         try {
-            // TODO: 실제 API 호출로 대체
-            // 임시로 로컬 사용자 정보 업데이트
-            const updatedUser = {
-                ...user,
+            // 백엔드 API 호출
+            await updateProfile( {
                 fishType: selectedFishType
-            };
-
-            // AuthContext의 사용자 정보 업데이트
-            login( updatedUser );
+            } );
 
             // 어항 속 물고기 타입도 업데이트
             if ( myFish ) {
@@ -48,7 +67,7 @@ const MyPage = () => {
             }, 3000 );
 
         } catch ( error ) {
-            setSaveMessage( '저장 중 오류가 발생했습니다. 다시 시도해주세요.' );
+            setSaveMessage( error.message || '저장 중 오류가 발생했습니다. 다시 시도해주세요.' );
         } finally {
             setIsSaving( false );
         }

@@ -26,24 +26,24 @@ const Login = () => {
         setError( '' );
 
         try {
-            // TODO: 실제 API 호출로 대체
-            // 임시 로그인 로직
-            if ( formData.email && formData.password ) {
-                const userData = {
-                    id: Date.now(),
-                    email: formData.email,
-                    name: formData.email.split( '@' )[ 0 ],
-                    fishType: 'goldfish',
-                    joinedAt: new Date().toISOString()
-                };
-
-                login( userData );
-                navigate( '/' );
-            } else {
-                setError( '이메일과 비밀번호를 입력해주세요.' );
-            }
+            await login( formData );
+            navigate( '/' );
         } catch ( err ) {
-            setError( '로그인에 실패했습니다. 다시 시도해주세요.' );
+            const errorMessage = err.message || '로그인에 실패했습니다. 다시 시도해주세요.';
+
+            // 미가입 사용자인 경우 회원가입 안내
+            if ( errorMessage.includes( '가입되지 않은 이메일' ) || errorMessage.includes( '회원가입' ) ) {
+                const shouldRegister = window.confirm(
+                    '가입되지 않은 이메일입니다.\n회원가입 페이지로 이동하시겠습니까?'
+                );
+
+                if ( shouldRegister ) {
+                    navigate( '/register' );
+                    return;
+                }
+            }
+
+            setError( errorMessage );
         } finally {
             setIsLoading( false );
         }
@@ -115,11 +115,11 @@ const Login = () => {
                     </p>
                 </div>
 
-                {/* 데모 계정 안내 */}
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-800 font-medium mb-2">🎯 데모 체험</p>
-                    <p className="text-xs text-blue-700">
-                        아무 이메일과 비밀번호를 입력하면 데모 계정으로 로그인됩니다.
+                {/* API 연동 안내 */}
+                <div className="mt-6 p-4 bg-green-50 rounded-lg">
+                    <p className="text-sm text-green-800 font-medium mb-2">🔗 실제 API 연동</p>
+                    <p className="text-xs text-green-700">
+                        백엔드 API와 연결되어 실제 로그인이 처리됩니다.
                     </p>
                 </div>
             </div>
