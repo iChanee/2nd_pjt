@@ -56,8 +56,8 @@ const LoginForm = () => {
                 <div className="max-w-md w-full">
                     {/* 메인 타이틀 */}
                     <div className="text-center mb-8">
-                        <div className="text-6xl mb-4">🐠</div>
-                        <h1 className="text-4xl font-bold text-white mb-2">Fish Tank</h1>
+                        {/* <div className="text-6xl mb-4">🐠</div> */}
+                        <h1 className="text-4xl font-bold text-white mb-2">🐠 Fish Tank 🐠</h1>
                         <p className="text-blue-100 text-lg">
                             어항 속 물고기가 되어 다른 사용자들과 함께 헤엄쳐보세요!
                         </p>
@@ -122,13 +122,6 @@ const LoginForm = () => {
                             </div>
                         </form>
 
-                        {/* 데모 안내 */}
-                        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                            <p className="text-sm text-blue-800 font-medium mb-2">🎯 데모 체험</p>
-                            <p className="text-xs text-blue-700">
-                                아무 이메일과 비밀번호를 입력하면 데모 계정으로 로그인됩니다.
-                            </p>
-                        </div>
                     </div>
 
                     {/* 하단 설명 */}

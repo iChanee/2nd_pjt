@@ -4,7 +4,7 @@
 
 ### 1. 백엔드 (Spring Boot)
 - **ChatMessage 엔티티**: 채팅 메시지 저장
-- **ChatController**: 채팅 API 엔드포인트 (`/api/chat/*`)
+- **ChatController**: 채팅 API 엔드포인트 (`/chat/*`)
 - **ChatService**: 채팅 비즈니스 로직 (스팸 방지, 메시지 관리)
 - **ChatMessageRepository**: 데이터베이스 쿼리
 
@@ -38,7 +38,7 @@
 
 ### 채팅 메시지 전송
 ```
-POST /api/chat/send
+POST /chat/send
 Authorization: Bearer {JWT_TOKEN}
 Content-Type: application/json
 
@@ -49,17 +49,17 @@ Content-Type: application/json
 
 ### 최근 메시지 조회
 ```
-GET /api/chat/messages
+GET /chat/messages
 ```
 
 ### 새 메시지 폴링
 ```
-GET /api/chat/messages/since?since=2026-01-09T16:00:00
+GET /chat/messages/since?since=2026-01-09T16:00:00
 ```
 
 ### 메시지 삭제
 ```
-DELETE /api/chat/messages/{messageId}
+DELETE /chat/messages/{messageId}
 Authorization: Bearer {JWT_TOKEN}
 ```
 
@@ -76,7 +76,7 @@ Authorization: Bearer {JWT_TOKEN}
 ### 채팅이 안 보이는 경우
 1. 로그인 상태 확인
 2. 브라우저 콘솔에서 에러 메시지 확인
-3. 백엔드 서버 상태 확인 (http://localhost:8080/api/chat/messages)
+3. 백엔드 서버 상태 확인 (http://localhost:8080/chat/messages)
 
 ### 메시지 전송 실패
 1. JWT 토큰 유효성 확인

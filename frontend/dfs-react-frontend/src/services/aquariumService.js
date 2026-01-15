@@ -29,9 +29,10 @@ const aquariumService = {
     getAllFishes: async () => {
         try {
             console.log( '🌐 API 호출 시작: /aquarium/fishes' );
+            const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
             // 인증 없이 직접 fetch 사용
-            const response = await fetch( 'http://localhost:8080/api/aquarium/fishes', {
+            const response = await fetch( `${ API_BASE_URL }/aquarium/fishes`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

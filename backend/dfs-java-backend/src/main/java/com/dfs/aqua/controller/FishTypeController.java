@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/fish-types")
+@RequestMapping("/api/fish-types")
 public class FishTypeController {
 
     @Autowired

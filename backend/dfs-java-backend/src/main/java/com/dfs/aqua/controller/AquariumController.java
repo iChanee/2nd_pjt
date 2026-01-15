@@ -18,8 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/aquarium")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/aquarium")
 public class AquariumController {
 
     @Autowired

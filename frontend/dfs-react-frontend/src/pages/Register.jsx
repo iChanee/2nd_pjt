@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getFishTypeOptions, getSpeedText, getSizeText, loadFishTypes } from '../utils/constants';
+import { getFishTypeOptions, getSpeedText, getSizeText } from '../utils/constants';
 
 const Register = () => {
     const [ formData, setFormData ] = useState( {
@@ -20,20 +20,8 @@ const Register = () => {
 
     // 컴포넌트 마운트 시 물고기 타입 로드
     useEffect( () => {
-        const loadOptions = async () => {
-            try {
-                await loadFishTypes();
-                const options = await getFishTypeOptions();
-                setFishTypeOptions( options );
-            } catch ( error ) {
-                console.error( 'Failed to load fish types:', error );
-                // 기본 옵션 사용
-                setFishTypeOptions( [
-                    { value: 'goldfish', label: '금붕어', emoji: '🐠', speed: 1.2, size: 'medium' }
-                ] );
-            }
-        };
-        loadOptions();
+        const options = getFishTypeOptions();
+        setFishTypeOptions( options );
     }, [] );
 
     const handleChange = ( e ) => {

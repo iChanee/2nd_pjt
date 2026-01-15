@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useFish } from '../contexts/FishContext';
-import { getFishTypeOptions, getSpeedText, getSizeText, loadFishTypes } from '../utils/constants';
+import { getFishTypeOptions, getSpeedText, getSizeText } from '../utils/constants';
 
 const MyPage = () => {
     const { user, logout, updateProfile } = useAuth();
@@ -16,20 +16,8 @@ const MyPage = () => {
 
     // 컴포넌트 마운트 시 물고기 타입 로드
     useEffect( () => {
-        const loadOptions = async () => {
-            try {
-                await loadFishTypes();
-                const options = await getFishTypeOptions();
-                setFishTypeOptions( options );
-            } catch ( error ) {
-                console.error( 'Failed to load fish types:', error );
-                // 기본 옵션 사용
-                setFishTypeOptions( [
-                    { value: 'goldfish', label: '금붕어', emoji: '🐠', speed: 1.2, size: 'medium' }
-                ] );
-            }
-        };
-        loadOptions();
+        const options = getFishTypeOptions();
+        setFishTypeOptions( options );
     }, [] );
 
     // 사용자 정보가 변경되면 선택된 물고기 타입도 업데이트

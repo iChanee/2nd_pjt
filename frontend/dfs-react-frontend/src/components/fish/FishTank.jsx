@@ -137,7 +137,7 @@ const FishTank = () => {
             // fetchAllFishes는 FishContext에서 자동으로 처리됨
             console.log( '로그인 감지, 서버 데이터 새로고침 예정' );
         }
-    }, [ isAuthenticated, user?.id ] );
+    }, [ isAuthenticated ] );
 
     // 로그아웃 시 물고기 제거 (단순화)
     useEffect( () => {
