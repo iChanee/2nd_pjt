@@ -3,12 +3,14 @@ package com.dfs.aqua.service;
 import com.dfs.aqua.dto.*;
 import com.dfs.aqua.entity.User;
 import com.dfs.aqua.repository.UserRepository;
-import com.dfs.aqua.repository.FishTypeRepository;
 import com.dfs.aqua.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @Transactional
@@ -18,13 +20,16 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private FishTypeRepository fishTypeRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    // 허용된 물고기 타입 목록 (프론트엔드와 동일)
+    private static final List<String> VALID_FISH_TYPES = Arrays.asList(
+        "goldfish", "tropical", "shark", "whale", "octopus", "crab",
+        "seal", "pufferfish", "crocodile", "coral", "frog", "shell"
+    );
 
     /**
      * 회원가입
@@ -36,7 +41,7 @@ public class AuthService {
         }
 
         // 물고기 타입 유효성 확인
-        if (!fishTypeRepository.existsById(request.getFishType())) {
+        if (!VALID_FISH_TYPES.contains(request.getFishType())) {
             throw new RuntimeException("유효하지 않은 물고기 타입입니다.");
         }
 
@@ -103,7 +108,7 @@ public class AuthService {
 
         // 물고기 타입 수정
         if (request.getFishType() != null && !request.getFishType().trim().isEmpty()) {
-            if (!fishTypeRepository.existsById(request.getFishType())) {
+            if (!VALID_FISH_TYPES.contains(request.getFishType())) {
                 throw new RuntimeException("유효하지 않은 물고기 타입입니다.");
             }
             user.setFishType(request.getFishType());

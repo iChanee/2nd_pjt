@@ -4,6 +4,7 @@ import com.dfs.aqua.filter.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -38,7 +39,8 @@ public class SecurityConfig {
                 "http://localhost:3000", "http://127.0.0.1:3000",
                 "http://dfs-prd-pub-alb-1550490073.ap-northeast-2.elb.amazonaws.com",
                 "https://dfs-prd-pub-alb-1550490073.ap-northeast-2.elb.amazonaws.com",
-                "https://www.yujeong91.shop"
+                "https://fish.yujeong91.shop",
+                "https://api.yujeong91.shop"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
@@ -56,11 +58,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // 자체 Bean!
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // OPTIONS 허용
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/aquarium/fishes").permitAll()
                         .requestMatchers("/api/aquarium/status").permitAll()
