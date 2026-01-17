@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import aquariumService from '../services/aquariumService';
 import { useAuth } from './AuthContext';
 
@@ -27,17 +27,42 @@ export const FishProvider = ( { children } ) => {
     // AuthContext에서 로그인 상태 가져오기
     const { isAuthenticated, user, session } = useAuth();
 
+    // 하트비트 관련 상태
+    const heartbeatIntervalRef = useRef( null );
+    const fetchIntervalRef = useRef( null );
+
+    // 서버에 하트비트 전송 (세션 활동 업데이트)
+    const sendHeartbeat = async () => {
+        if ( !isAuthenticated || !user?.token ) {
+            console.log( '💔 하트비트 전송 불가: 로그인되지 않음 또는 토큰 없음', { isAuthenticated, hasToken: !!user?.token } );
+            return;
+        }
+
+        try {
+            const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+
+            await fetch( `${ API_BASE_URL }/aquarium/heartbeat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${ user.token }`
+                }
+            } );
+
+            console.log( '💓 하트비트 전송 성공' );
+        } catch ( error ) {
+            console.error( '� 하트비트 전송 실패:', error );
+        }
+    };
+
     // 서버에서 모든 온라인 물고기 데이터 가져오기
     const fetchAllFishes = async () => {
         try {
             setIsLoading( true );
-            console.log( '🔍 서버에서 물고기 데이터 가져오는 중...' );
-            console.log( '🔍 현재 시간:', new Date().toISOString() );
 
             const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
             // 직접 fetch로 테스트 (CORS 및 네트워크 문제 확인)
-            console.log( '🌐 직접 fetch 테스트 시작' );
             const testResponse = await fetch( `${ API_BASE_URL }/aquarium/fishes`, {
                 method: 'GET',
                 headers: {
@@ -45,22 +70,13 @@ export const FishProvider = ( { children } ) => {
                 },
             } );
 
-            console.log( '🌐 테스트 응답 상태:', testResponse.status );
-            console.log( '🌐 테스트 응답 OK:', testResponse.ok );
-
             if ( !testResponse.ok ) {
                 throw new Error( `HTTP error! status: ${ testResponse.status }` );
             }
 
             const testData = await testResponse.json();
-            console.log( '🌐 테스트 데이터:', testData );
 
             const fishSessions = testData;
-            console.log( '🐠 서버에서 받은 데이터:', fishSessions );
-            console.log( '🐠 데이터 타입:', typeof fishSessions );
-            console.log( '🐠 데이터가 배열인가?', Array.isArray( fishSessions ) );
-            console.log( '🐠 데이터 키들:', fishSessions ? Object.keys( fishSessions ) : 'null/undefined' );
-            console.log( '🐠 JSON 문자열:', JSON.stringify( fishSessions, null, 2 ) );
 
             // 데이터가 배열이 아니거나 undefined인 경우 처리
             if ( !fishSessions || !Array.isArray( fishSessions ) ) {
@@ -85,7 +101,6 @@ export const FishProvider = ( { children } ) => {
                 lastActivityAt: new Date( session.lastActivityAt )
             } ) );
 
-            console.log( '🎯 변환된 물고기 데이터:', formattedFishes );
             setFishes( formattedFishes );
         } catch ( error ) {
             console.error( '❌ 물고기 데이터 가져오기 실패:', error );
@@ -100,26 +115,62 @@ export const FishProvider = ( { children } ) => {
         }
     };
 
-    // 주기적으로 물고기 데이터 업데이트 (서버 연동 복구)
+    // 주기적으로 물고기 데이터 업데이트 및 하트비트 전송
     useEffect( () => {
-        let interval;
-
         console.log( '🔄 FishContext useEffect 시작 - 서버 연동 모드로 복구' );
+        console.log( '🔍 현재 상태:', { isAuthenticated, user: user?.name, hasToken: !!user?.token } );
+
+        // 기존 인터벌 정리
+        if ( fetchIntervalRef.current ) {
+            clearInterval( fetchIntervalRef.current );
+        }
+        if ( heartbeatIntervalRef.current ) {
+            clearInterval( heartbeatIntervalRef.current );
+        }
 
         // 초기 데이터 로드
         console.log( '🔄 초기 데이터 로드 시작' );
         fetchAllFishes();
 
-        // 5초마다 업데이트
+        // 5초마다 물고기 데이터 업데이트
         console.log( '🔄 5초 간격 업데이트 설정' );
-        interval = setInterval( () => {
+        fetchIntervalRef.current = setInterval( () => {
             console.log( '🔄 정기 업데이트 실행' );
             fetchAllFishes();
         }, 5000 );
 
+        // 로그인된 사용자만 하트비트 전송 (30초마다)
+        console.log( '🔍 하트비트 조건 확인:', {
+            isAuthenticated,
+            hasUser: !!user,
+            hasToken: !!user?.token,
+            userId: user?.id,
+            userName: user?.name
+        } );
+
+        if ( isAuthenticated && user?.token ) {
+            console.log( '� 하트비트 시스템 시작' );
+
+            // 즉시 하트비트 전송
+            sendHeartbeat();
+
+            // 10초마다 하트비트 전송 (테스트용)
+            heartbeatIntervalRef.current = setInterval( () => {
+                console.log( '💓 정기 하트비트 전송' );
+                sendHeartbeat();
+            }, 10000 );
+        }
+
         // 사용자 로그아웃 시 즉시 새로고침을 위한 이벤트 리스너
         const handleUserLogout = () => {
             console.log( '🔄 사용자 로그아웃 감지 - 물고기 데이터 즉시 새로고침' );
+
+            // 하트비트 중지
+            if ( heartbeatIntervalRef.current ) {
+                clearInterval( heartbeatIntervalRef.current );
+                heartbeatIntervalRef.current = null;
+            }
+
             fetchAllFishes();
         };
 
@@ -135,17 +186,35 @@ export const FishProvider = ( { children } ) => {
             }, 2000 );
         };
 
+        // 브라우저 종료/새로고침 감지
+        const handleBeforeUnload = () => {
+            console.log( '🚪 브라우저 종료/새로고침 감지' );
+
+            // 동기적으로 로그아웃 요청 (브라우저 종료 시에도 실행됨)
+            if ( isAuthenticated && session?.sessionToken ) {
+                navigator.sendBeacon(
+                    `${ process.env.REACT_APP_API_URL || 'http://localhost:8080/api' }/aquarium/leave-token`,
+                    JSON.stringify( { sessionToken: session.sessionToken } )
+                );
+            }
+        };
+
         window.addEventListener( 'userLogout', handleUserLogout );
         window.addEventListener( 'userLogin', handleUserLogin );
+        window.addEventListener( 'beforeunload', handleBeforeUnload );
 
         return () => {
-            if ( interval ) {
-                clearInterval( interval );
+            if ( fetchIntervalRef.current ) {
+                clearInterval( fetchIntervalRef.current );
+            }
+            if ( heartbeatIntervalRef.current ) {
+                clearInterval( heartbeatIntervalRef.current );
             }
             window.removeEventListener( 'userLogout', handleUserLogout );
             window.removeEventListener( 'userLogin', handleUserLogin );
+            window.removeEventListener( 'beforeunload', handleBeforeUnload );
         };
-    }, [] );
+    }, [ isAuthenticated, user?.token ] );
 
     // 로그인 상태 변화 감지 - 로그인 성공 시 즉시 새로고침
     useEffect( () => {

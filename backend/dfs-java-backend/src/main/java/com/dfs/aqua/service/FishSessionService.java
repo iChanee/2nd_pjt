@@ -137,8 +137,15 @@ public class FishSessionService {
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 세션입니다."));
 
         if (session.getIsOnline()) {
-            session.setLastActivityAt(LocalDateTime.now());
+            LocalDateTime now = LocalDateTime.now();
+            session.setLastActivityAt(now);
             fishSessionRepository.save(session);
+            
+            // 디버그 로그 추가
+            System.out.println("💓 하트비트 업데이트: " + session.getUser().getName() + 
+                             " (sessionToken: " + sessionToken + ", time: " + now + ")");
+        } else {
+            System.out.println("⚠️ 오프라인 세션에 하트비트 시도: " + sessionToken);
         }
     }
 
@@ -148,6 +155,14 @@ public class FishSessionService {
     public int cleanupInactiveSessions() {
         LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(5);
         return fishSessionRepository.markInactiveSessionsOffline(cutoffTime);
+    }
+
+    /**
+     * 오래된 오프라인 세션 완전 삭제 (1시간 이상)
+     */
+    public int deleteOldOfflineSessions() {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1);
+        return fishSessionRepository.deleteOldOfflineSessions(cutoffTime);
     }
 
     /**

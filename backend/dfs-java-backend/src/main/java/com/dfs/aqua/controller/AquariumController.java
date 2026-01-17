@@ -7,6 +7,8 @@ import com.dfs.aqua.service.FishSessionService;
 import com.dfs.aqua.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/aquarium")
 public class AquariumController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AquariumController.class);
 
     @Autowired
     private FishSessionService fishSessionService;
@@ -44,7 +48,7 @@ public class AquariumController {
     }
 
     /**
-     * 어항 퇴장
+     * 어항 퇴장 - JWT 토큰 기반
      */
     @PostMapping("/leave")
     public ResponseEntity<?> leaveAquarium(HttpServletRequest request) {
@@ -53,6 +57,32 @@ public class AquariumController {
             fishSessionService.leaveAquarium(userId);
             
             return ResponseEntity.ok(Map.of("message", "어항에서 퇴장했습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * 어항 퇴장 - 세션 토큰 기반 (브라우저 종료 감지용)
+     */
+    @PostMapping("/leave-token")
+    public ResponseEntity<?> leaveAquariumByToken(@RequestBody Map<String, String> request) {
+        try {
+            String sessionToken = request.get("sessionToken");
+            if (sessionToken == null || sessionToken.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "세션 토큰이 필요합니다."));
+            }
+            
+            Optional<FishSession> sessionOpt = fishSessionService.getSessionByToken(sessionToken);
+            if (sessionOpt.isPresent()) {
+                fishSessionService.leaveAquarium(sessionOpt.get().getUser().getId());
+                return ResponseEntity.ok(Map.of("message", "어항에서 퇴장했습니다."));
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "유효하지 않은 세션입니다."));
+            }
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", e.getMessage()));
@@ -157,7 +187,7 @@ public class AquariumController {
     }
 
     /**
-     * 활동 업데이트 (하트비트)
+     * 활동 업데이트 (하트비트) - JWT 토큰 기반
      */
     @PostMapping("/heartbeat")
     public ResponseEntity<?> heartbeat(HttpServletRequest request) {
@@ -166,12 +196,42 @@ public class AquariumController {
             Optional<FishSession> sessionOpt = fishSessionService.getActiveSession(userId);
             
             if (sessionOpt.isEmpty()) {
+                logger.warn("하트비트 실패: 활성 세션이 없습니다. userId={}", userId);
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "활성 세션이 없습니다."));
             }
             
             fishSessionService.updateActivity(sessionOpt.get().getSessionToken());
-            return ResponseEntity.ok(Map.of("message", "활동 시간이 업데이트되었습니다."));
+            logger.info("하트비트 성공: userId={}, sessionToken={}", userId, sessionOpt.get().getSessionToken());
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "활동 시간이 업데이트되었습니다.",
+                "timestamp", System.currentTimeMillis()
+            ));
+        } catch (Exception e) {
+            logger.error("하트비트 처리 중 오류 발생", e);
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * 활동 업데이트 (하트비트) - 세션 토큰 기반 (브라우저 종료 감지용)
+     */
+    @PostMapping("/heartbeat-token")
+    public ResponseEntity<?> heartbeatByToken(@RequestBody Map<String, String> request) {
+        try {
+            String sessionToken = request.get("sessionToken");
+            if (sessionToken == null || sessionToken.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "세션 토큰이 필요합니다."));
+            }
+            
+            fishSessionService.updateActivity(sessionToken);
+            return ResponseEntity.ok(Map.of(
+                "message", "활동 시간이 업데이트되었습니다.",
+                "timestamp", System.currentTimeMillis()
+            ));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", e.getMessage()));

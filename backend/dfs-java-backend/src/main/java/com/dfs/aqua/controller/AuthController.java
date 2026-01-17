@@ -145,39 +145,26 @@ public class AuthController {
      */
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
-        System.out.println("=== AuthController.logout 호출됨 ===");
-        
         try {
             // JWT 토큰에서 사용자 ID 추출
             String authHeader = request.getHeader("Authorization");
-            System.out.println("Authorization 헤더: " + authHeader);
             
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
-                System.out.println("토큰 추출됨");
                 
                 if (jwtUtil.validateToken(token)) {
                     Long userId = jwtUtil.getUserIdFromToken(token);
-                    System.out.println("사용자 ID: " + userId);
                     
                     // 사용자 세션을 완전히 삭제 (DB에서 제거)
-                    System.out.println("deleteUserSessions 호출 시작");
                     fishSessionService.deleteUserSessions(userId);
-                    System.out.println("deleteUserSessions 호출 완료");
-                } else {
-                    System.out.println("토큰이 유효하지 않음");
-                }
-            } else {
-                System.out.println("Authorization 헤더가 없음");
+                } 
             }
             
             Map<String, String> response = new HashMap<>();
             response.put("message", "로그아웃되었습니다.");
-            System.out.println("=== AuthController.logout 완료 ===");
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            System.err.println("로그아웃 에러: " + e.getMessage());
             e.printStackTrace();
             
             Map<String, String> response = new HashMap<>();

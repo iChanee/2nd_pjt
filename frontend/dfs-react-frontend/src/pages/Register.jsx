@@ -71,7 +71,7 @@ const Register = () => {
             <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
                 <div className="text-center mb-8">
                     <div className="text-4xl mb-4">🐟</div>
-                    <h1 className="text-2xl font-bold text-gray-800">Fish Tank 회원가입</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">원양어선 회원가입</h1>
                     <p className="text-gray-600 mt-2">나만의 물고기로 어항에 참여하세요!</p>
                 </div>
 

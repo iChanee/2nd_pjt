@@ -22,13 +22,13 @@ const apiRequest = async ( endpoint, options = {} ) => {
     try {
         const response = await fetch( url, config );
 
-        // 디버깅을 위한 로그
-        console.log( 'API Request:', {
-            url,
-            method: config.method || 'GET',
-            headers: config.headers,
-            body: config.body
-        } );
+        // // 디버깅을 위한 로그
+        // console.log( 'API Request:', {
+        //     url,
+        //     method: config.method || 'GET',
+        //     headers: config.headers,
+        //     body: config.body
+        // } );
 
         // 응답이 JSON이 아닐 수도 있으므로 확인
         const contentType = response.headers.get( 'content-type' );
@@ -40,12 +40,12 @@ const apiRequest = async ( endpoint, options = {} ) => {
             data = await response.text();
         }
 
-        // 디버깅을 위한 로그
-        console.log( 'API Response:', {
-            status: response.status,
-            ok: response.ok,
-            data
-        } );
+        // // 디버깅을 위한 로그
+        // console.log( 'API Response:', {
+        //     status: response.status,
+        //     ok: response.ok,
+        //     data
+        // } );
 
         if ( !response.ok ) {
             // 백엔드에서 에러 메시지를 JSON으로 보내는 경우

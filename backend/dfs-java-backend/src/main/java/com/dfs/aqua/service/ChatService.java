@@ -83,6 +83,14 @@ public class ChatService {
     }
 
     /**
+     * 5분 이상된 모든 채팅 메시지 삭제
+     */
+    public int deleteMessagesOlderThan5Minutes() {
+        LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
+        return chatMessageRepository.deleteByCreatedAtBefore(fiveMinutesAgo);
+    }
+
+    /**
      * 오래된 메시지 정리 (30일 이상)
      */
     public int cleanupOldMessages() {

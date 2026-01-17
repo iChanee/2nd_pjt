@@ -29,7 +29,12 @@ export const AuthProvider = ( { children } ) => {
                     const validation = await authService.validateToken();
 
                     if ( validation.valid ) {
-                        setUser( validation.user || storedUser );
+                        // user 객체에 token 포함
+                        const userWithToken = {
+                            ...( validation.user || storedUser ),
+                            token: storedToken
+                        };
+                        setUser( userWithToken );
                         // 로그인 상태라면 어항 세션 확인
                         try {
                             const sessionData = await aquariumService.getMySession();
@@ -65,7 +70,6 @@ export const AuthProvider = ( { children } ) => {
                 try {
                     await aquariumService.deleteSession();
                     localStorage.removeItem( 'needSessionCleanup' );
-                    console.log( '이전 세션이 정리되었습니다.' );
                 } catch ( error ) {
                     console.error( 'Failed to cleanup previous session:', error );
                 }
@@ -94,7 +98,13 @@ export const AuthProvider = ( { children } ) => {
         try {
             setIsLoading( true );
             const response = await authService.login( credentials );
-            setUser( response.user );
+
+            // user 객체에 token 포함
+            const userWithToken = {
+                ...response.user,
+                token: response.token
+            };
+            setUser( userWithToken );
 
             // 로그인 성공 후 자동으로 어항 입장
             try {
@@ -104,7 +114,7 @@ export const AuthProvider = ( { children } ) => {
 
                 // FishContext에 로그인 성공 알림
                 window.dispatchEvent( new CustomEvent( 'userLogin', {
-                    detail: { user: response.user, session: sessionData }
+                    detail: { user: userWithToken, session: sessionData }
                 } ) );
             } catch ( sessionError ) {
                 console.error( '어항 입장 실패:', sessionError );
@@ -123,7 +133,13 @@ export const AuthProvider = ( { children } ) => {
         try {
             setIsLoading( true );
             const response = await authService.register( userData );
-            setUser( response.user );
+
+            // user 객체에 token 포함
+            const userWithToken = {
+                ...response.user,
+                token: response.token
+            };
+            setUser( userWithToken );
 
             // 회원가입 성공 후 자동으로 어항 입장
             try {
@@ -133,7 +149,7 @@ export const AuthProvider = ( { children } ) => {
 
                 // FishContext에 로그인 성공 알림
                 window.dispatchEvent( new CustomEvent( 'userLogin', {
-                    detail: { user: response.user, session: sessionData }
+                    detail: { user: userWithToken, session: sessionData }
                 } ) );
             } catch ( sessionError ) {
                 console.error( '어항 입장 실패:', sessionError );

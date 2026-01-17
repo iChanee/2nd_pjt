@@ -23,7 +23,6 @@ export const ChatProvider = ( { children } ) => {
         try {
             setIsLoading( true );
             const recentMessages = await chatService.getRecentMessages();
-            console.log( '📨 최근 메시지 로드:', recentMessages );
 
             // 시간순으로 정렬 (오래된 것부터)
             const sortedMessages = recentMessages.sort( ( a, b ) =>
@@ -44,7 +43,6 @@ export const ChatProvider = ( { children } ) => {
         try {
             const newMessages = await chatService.getMessagesSince( lastFetchTime );
             if ( newMessages.length > 0 ) {
-                console.log( '📨 새 메시지 수신:', newMessages );
 
                 // 새 메시지를 기존 메시지에 추가
                 setMessages( prev => {
@@ -77,9 +75,7 @@ export const ChatProvider = ( { children } ) => {
                 throw new Error( '메시지를 입력해주세요.' );
             }
 
-            console.log( '📤 메시지 전송 시도:', message );
             const sentMessage = await chatService.sendMessage( message.trim() );
-            console.log( '✅ 메시지 전송 성공:', sentMessage );
 
             // 전송된 메시지를 즉시 목록에 추가
             setMessages( prev => {

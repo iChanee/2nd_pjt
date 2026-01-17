@@ -1,25 +1,26 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "원양어선",
+  "name": "원양어선 - 온라인 어항",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛵</text></svg>",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/svg+xml"
     },
     {
-      "src": "logo192.png",
-      "type": "image/png",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><text y='.9em' font-size='180'>⛵</text></svg>",
+      "type": "image/svg+xml",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
-      "type": "image/png",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><text y='.9em' font-size='480'>⛵</text></svg>",
+      "type": "image/svg+xml",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#0ea5e9",
+  "background_color": "#f0f9ff",
+  "description": "온라인 어항에서 다른 사람들과 함께 물고기가 되어보세요!"
 }

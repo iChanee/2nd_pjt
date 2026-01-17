@@ -54,7 +54,7 @@ const Login = () => {
             <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
                 <div className="text-center mb-8">
                     <div className="text-4xl mb-4">🐠</div>
-                    <h1 className="text-2xl font-bold text-gray-800">Fish Tank 로그인</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">원양어선 로그인</h1>
                     <p className="text-gray-600 mt-2">어항 속 물고기가 되어보세요!</p>
                 </div>
 

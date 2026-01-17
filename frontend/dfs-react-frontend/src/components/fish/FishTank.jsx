@@ -24,31 +24,20 @@ const FishTank = () => {
                 return;
             }
 
-            console.log( '� 새 채팅 메시지 감지:', latestMessage );
-            console.log( '💬 현재 물고기 목록:', fishes.map( f => ( { id: f.id, userId: f.userId, name: f.name } ) ) );
-
             // 해당 사용자의 물고기 찾기
             const senderFish = fishes.find( fish => fish.userId === latestMessage.userId );
             if ( senderFish ) {
-                console.log( '🐠 메시지 발신자 물고기 찾음:', senderFish );
                 // 물고기 말풍선에 메시지 표시
                 addFishMessage( senderFish.id, latestMessage.message );
 
                 // 처리된 메시지 ID 추가
                 setProcessedMessageIds( prev => new Set( prev ).add( latestMessage.id ) );
             } else {
-                console.log( '❌ 메시지 발신자 물고기를 찾을 수 없음:', {
-                    senderId: latestMessage.userId,
-                    senderName: latestMessage.userName,
-                    availableFishes: fishes.map( f => ( { id: f.id, userId: f.userId, name: f.name } ) )
-                } );
-
+              
                 // 물고기 데이터를 다시 가져와서 매칭 재시도
-                console.log( '🔄 물고기 데이터 새로고침 후 재시도' );
                 setTimeout( () => {
                     const retryFish = fishes.find( fish => fish.userId === latestMessage.userId );
                     if ( retryFish ) {
-                        console.log( '🐠 재시도로 물고기 찾음:', retryFish );
                         addFishMessage( retryFish.id, latestMessage.message );
 
                         // 처리된 메시지 ID 추가
@@ -61,13 +50,6 @@ const FishTank = () => {
 
     // 물고기 데이터 디버깅
     useEffect( () => {
-        // console.log( '🐠 FishTank - 물고기 데이터 변경:', {
-        //     fishCount: fishes.length,
-        //     fishes: fishes,
-        //     isLoading: isLoading,
-        //     isAuthenticated: isAuthenticated,
-        //     user: user
-        // } );
     }, [ fishes, isLoading, isAuthenticated, user ] );
 
     // 먹이주기 이펙트
@@ -111,10 +93,8 @@ const FishTank = () => {
     // 채팅 전송 함수 (물고기 말풍선으로 표시)
     const handleSendMessage = async ( e ) => {
         e.preventDefault();
-        console.log( '채팅 전송 시도:', { chatMessage, isAuthenticated, user } );
 
         if ( !chatMessage.trim() || !isAuthenticated || !user ) {
-            console.log( '채팅 전송 실패: 조건 불만족' );
             return;
         }
 
@@ -122,7 +102,6 @@ const FishTank = () => {
             // 공유 채팅 시스템으로 메시지 전송
             await sendMessage( chatMessage.trim() );
             setChatMessage( '' ); // 입력창 초기화
-            console.log( '✅ 채팅 메시지 전송 성공 - 물고기 말풍선으로 표시됨' );
         } catch ( error ) {
             console.error( '❌ 채팅 전송 실패:', error );
             alert( '메시지 전송에 실패했습니다: ' + error.message );

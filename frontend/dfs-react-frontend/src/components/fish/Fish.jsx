@@ -45,7 +45,6 @@ const Fish = ( { fish } ) => {
         const randomFactor = 0.7 + Math.random() * 0.6; // 0.7 ~ 1.3 배수
 
         const interval = Math.max( 800, ( baseInterval / speedMultiplier ) * randomFactor );
-        console.log( `⏱️ Fish ${ fish.id } (${ fish.type }) 간격: ${ interval.toFixed( 0 ) }ms (속도: ${ speedMultiplier })` );
         return interval;
     };
 
@@ -61,8 +60,6 @@ const Fish = ( { fish } ) => {
             x: e.clientX - rect.left,
             y: e.clientY - rect.top
         } );
-
-        console.log( `Fish ${ fish.id } 드래그 시작` );
     };
 
     // 드래그 중
@@ -91,7 +88,6 @@ const Fish = ( { fish } ) => {
     const handleMouseUp = () => {
         if ( isDragging ) {
             setIsDragging( false );
-            console.log( `Fish ${ fish.id } 드래그 종료: X: ${ position.x.toFixed( 1 ) }%, Y: ${ position.y.toFixed( 1 ) }%` );
         }
     };
 
@@ -116,7 +112,6 @@ const Fish = ( { fish } ) => {
             setPosition( prev => {
                 // 가끔 쉬기 (성격에 따라)
                 if ( Math.random() < fishPersonality.restProbability ) {
-                    // console.log( `� Fish ${ fish.id } 휴식 중...` );
                     return prev; // 움직이지 않음
                 }
 
@@ -133,8 +128,6 @@ const Fish = ( { fish } ) => {
                     x: Math.max( 5, Math.min( 95, prev.x + personalizedMovement.x ) ), // % 기반 (X축)
                     y: Math.max( 50, Math.min( 500, prev.y + personalizedMovement.y * 20 ) ) // px 기반 (Y축, 움직임 증폭)
                 };
-
-                // console.log( `🐠 Fish ${ fish.id } (${ fish.type }): X=${ newPosition.x.toFixed( 1 ) }%, Y=${ newPosition.y.toFixed( 0 ) }px` );
 
                 // 방향 결정
                 if ( newPosition.x > prev.x ) setDirection( 1 );

@@ -12,14 +12,7 @@ const Header = () => {
         // 현재 사용자의 물고기 찾기
         const userFish = fishes.find( fish => fish.userId === user?.id );
 
-        console.log( '로그아웃 시도:', {
-            userId: user?.id,
-            userFish,
-            allFishes: fishes.map( f => ( { id: f.id, userId: f.userId, type: f.type, name: f.name } ) )
-        } );
-
         if ( userFish ) {
-            console.log( '사용자 물고기 발견, 애니메이션 시작:', userFish );
             // 로그아웃 애니메이션 시작
             startLogoutAnimation( userFish.id );
 
@@ -29,7 +22,6 @@ const Header = () => {
                 navigate( '/' );
             }, 2000 );
         } else {
-            console.log( '사용자 물고기를 찾을 수 없음, 바로 로그아웃' );
             // 물고기가 없으면 바로 로그아웃
             logout();
             navigate( '/' );
@@ -43,7 +35,7 @@ const Header = () => {
                     {/* 왼쪽: 로고 및 웰컴 메시지 */}
                     <div className="flex items-center space-x-6">
                         <div className="flex items-center space-x-3">
-                            {/* Fish Tank 정보 아이콘 (hover 시 정보 표시) */}
+                            {/* 원양어선 정보 아이콘 (hover 시 정보 표시) */}
                             {isAuthenticated && (
                                 <div className="relative group">
                                     <div className="cursor-pointer text-blue-200 hover:text-white transition-colors">
@@ -53,7 +45,7 @@ const Header = () => {
                                     {/* Hover 시 나타나는 정보 패널 */}
                                     <div className="absolute top-full left-0 mt-2 bg-black bg-opacity-90 text-white p-4 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-50 min-w-64">
                                         <h3 className="text-lg font-bold mb-2 flex items-center">
-                                            🐠 Fish Tank 정보
+                                            🐠 원양어선 정보
                                         </h3>
                                         <p className="text-sm mb-2">현재 물고기: <span className="font-bold text-blue-300">{fishes.length}마리</span></p>
                                         <p className="text-xs text-gray-300 mb-3">
@@ -90,7 +82,7 @@ const Header = () => {
                                 </div>
                             )}
                             <Link to="/" className="text-2xl font-bold flex items-center hover:text-blue-200 transition-colors">
-                                Fish Tank
+                                원양어선
                             </Link>
 
 

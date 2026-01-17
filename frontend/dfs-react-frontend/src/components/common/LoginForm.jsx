@@ -57,7 +57,7 @@ const LoginForm = () => {
                     {/* 메인 타이틀 */}
                     <div className="text-center mb-8">
                         {/* <div className="text-6xl mb-4">🐠</div> */}
-                        <h1 className="text-4xl font-bold text-white mb-2">🐠 Fish Tank 🐠</h1>
+                        <h1 className="text-4xl font-bold text-white mb-2">🐠 원양어선 🐠</h1>
                         <p className="text-blue-100 text-lg">
                             어항 속 물고기가 되어 다른 사용자들과 함께 헤엄쳐보세요!
                         </p>

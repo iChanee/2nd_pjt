@@ -2,6 +2,7 @@ package com.dfs.aqua.repository;
 
 import com.dfs.aqua.entity.ChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -51,9 +52,17 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     long countUserMessagesSince(@Param("userId") Long userId, @Param("since") LocalDateTime since);
 
     /**
-     * 오래된 메시지 정리 (30일 이상)
+     * 특정 시간 이전의 메시지 완전 삭제
      */
+    @Modifying
+    @Query("DELETE FROM ChatMessage cm WHERE cm.createdAt < :cutoffDate")
+    int deleteByCreatedAtBefore(@Param("cutoffDate") LocalDateTime cutoffDate);
+
+    /**
+     * 오래된 메시지 정리 (30일 이상) - 소프트 삭제
+     */
+    @Modifying
     @Query("UPDATE ChatMessage cm SET cm.isDeleted = true " +
-           "WHERE cm.createdAt < :cutoffDate")
+           "WHERE cm.createdAt < :cutoffDate AND cm.isDeleted = false")
     int markOldMessagesAsDeleted(@Param("cutoffDate") LocalDateTime cutoffDate);
 }
