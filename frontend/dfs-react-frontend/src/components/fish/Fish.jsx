@@ -27,14 +27,14 @@ const Fish = ( { fish } ) => {
 
     const currentMessage = fishMessages[ fish.id ];
 
-    // 크기 클래스 결정
+    // 크기 클래스 결정 - 반응형 개선
     const getSizeClass = ( size ) => {
         switch ( size ) {
-            case 'small': return 'text-3xl';      // 작은 물고기 (기존 text-lg → text-3xl)
-            case 'medium': return 'text-4xl';     // 중간 물고기 (기존 text-2xl → text-4xl)
-            case 'large': return 'text-5xl';      // 큰 물고기 (기존 text-3xl → text-5xl)
-            case 'xlarge': return 'text-6xl';     // 매우 큰 물고기 (기존 text-4xl → text-6xl)
-            default: return 'text-4xl';
+            case 'small': return 'text-xl sm:text-2xl lg:text-3xl';      // 작은 물고기
+            case 'medium': return 'text-2xl sm:text-3xl lg:text-4xl';    // 중간 물고기
+            case 'large': return 'text-3xl sm:text-4xl lg:text-5xl';     // 큰 물고기
+            case 'xlarge': return 'text-4xl sm:text-5xl lg:text-6xl';    // 매우 큰 물고기
+            default: return 'text-2xl sm:text-3xl lg:text-4xl';
         }
     };
 
@@ -48,29 +48,36 @@ const Fish = ( { fish } ) => {
         return interval;
     };
 
-    // 드래그 시작
+    // 드래그 시작 - 터치 이벤트 지원 추가
     const handleMouseDown = ( e ) => {
         e.preventDefault();
         setIsDragging( true );
 
         const rect = fishRef.current.getBoundingClientRect();
-        const containerRect = fishRef.current.parentElement.getBoundingClientRect();
+
+        // 마우스와 터치 이벤트 모두 지원
+        const clientX = e.touches ? e.touches[ 0 ].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[ 0 ].clientY : e.clientY;
 
         setDragOffset( {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: clientX - rect.left,
+            y: clientY - rect.top
         } );
     };
 
-    // 드래그 중
+    // 드래그 중 - 터치 이벤트 지원 추가
     const handleMouseMove = ( e ) => {
         if ( !isDragging ) return;
 
         e.preventDefault();
         const containerRect = fishRef.current.parentElement.getBoundingClientRect();
 
-        const newX = ( ( e.clientX - dragOffset.x - containerRect.left ) / containerRect.width ) * 100;
-        const newY = ( ( e.clientY - dragOffset.y - containerRect.top ) / containerRect.height ) * 100;
+        // 마우스와 터치 이벤트 모두 지원
+        const clientX = e.touches ? e.touches[ 0 ].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[ 0 ].clientY : e.clientY;
+
+        const newX = ( ( clientX - dragOffset.x - containerRect.left ) / containerRect.width ) * 100;
+        const newY = ( ( clientY - dragOffset.y - containerRect.top ) / containerRect.height ) * 100;
 
         const clampedPosition = {
             x: Math.max( 0, Math.min( 100, newX ) ),
@@ -91,15 +98,22 @@ const Fish = ( { fish } ) => {
         }
     };
 
-    // 전역 마우스 이벤트 리스너
+    // 전역 마우스/터치 이벤트 리스너
     useEffect( () => {
         if ( isDragging ) {
+            // 마우스 이벤트
             document.addEventListener( 'mousemove', handleMouseMove );
             document.addEventListener( 'mouseup', handleMouseUp );
+
+            // 터치 이벤트
+            document.addEventListener( 'touchmove', handleMouseMove, { passive: false } );
+            document.addEventListener( 'touchend', handleMouseUp );
 
             return () => {
                 document.removeEventListener( 'mousemove', handleMouseMove );
                 document.removeEventListener( 'mouseup', handleMouseUp );
+                document.removeEventListener( 'touchmove', handleMouseMove );
+                document.removeEventListener( 'touchend', handleMouseUp );
             };
         }
     }, [ isDragging, dragOffset, position ] );
@@ -143,7 +157,7 @@ const Fish = ( { fish } ) => {
     return (
         <div
             ref={fishRef}
-            className={`absolute cursor-pointer hover:scale-110 ${ isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab' }`}
+            className={`absolute cursor-pointer hover:scale-110 ${ isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab' } touch-none`}
             style={{
                 left: `${ position.x }%`,
                 top: `${ position.y }px`, // px 기반으로 변경
@@ -153,11 +167,12 @@ const Fish = ( { fish } ) => {
             }}
             title={`${ fish.name } - X: ${ position.x.toFixed( 1 ) }%, Y: ${ position.y.toFixed( 0 ) }px`}
             onMouseDown={handleMouseDown}
+            onTouchStart={handleMouseDown}
         >
-            {/* 말풍선 */}
+            {/* 말풍선 - 반응형 개선 */}
             {currentMessage && (
                 <div
-                    className={`absolute animate-bounce-in ${ position.y < 30 ? 'top-full mt-3' : 'bottom-full mb-3'
+                    className={`absolute animate-bounce-in ${ position.y < 30 ? 'top-full mt-2 sm:mt-3' : 'bottom-full mb-2 sm:mb-3'
                         }`}
                     style={{
                         zIndex: 100,
@@ -166,10 +181,10 @@ const Fish = ( { fish } ) => {
                     }}
                 >
                     <div
-                        className="relative bg-white text-gray-800 px-4 py-3 rounded-2xl shadow-2xl border border-gray-200 text-sm font-medium break-words"
+                        className="relative bg-white text-gray-800 px-2 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-2xl border border-gray-200 text-xs sm:text-sm font-medium break-words"
                         style={{
-                            minWidth: '80px',
-                            maxWidth: '280px',
+                            minWidth: '60px',
+                            maxWidth: window.innerWidth < 640 ? '200px' : '280px', // 모바일에서 더 작게
                             width: 'max-content',
                             textAlign: 'center',
                             wordBreak: 'break-word',
@@ -185,8 +200,8 @@ const Fish = ( { fish } ) => {
                         >
                             <div
                                 className={`w-0 h-0 ${ position.y < 30
-                                    ? 'border-l-4 border-r-4 border-b-4 border-transparent border-b-white'
-                                    : 'border-l-4 border-r-4 border-t-4 border-transparent border-t-white'
+                                    ? 'border-l-2 border-r-2 border-b-2 sm:border-l-4 sm:border-r-4 sm:border-b-4 border-transparent border-b-white'
+                                    : 'border-l-2 border-r-2 border-t-2 sm:border-l-4 sm:border-r-4 sm:border-t-4 border-transparent border-t-white'
                                     }`}
                             ></div>
                         </div>
@@ -205,8 +220,8 @@ const Fish = ( { fish } ) => {
                 {getFishEmoji( fish.type )}
             </div>
 
-            {/* 이름 */}
-            <div className="text-xs text-white bg-black bg-opacity-50 rounded px-1 mt-1 text-center whitespace-nowrap">
+            {/* 이름 - 반응형 개선 */}
+            <div className="text-xs sm:text-xs text-white bg-black bg-opacity-50 rounded px-1 mt-1 text-center whitespace-nowrap max-w-[80px] sm:max-w-none overflow-hidden text-ellipsis">
                 {fish.name}
             </div>
         </div>

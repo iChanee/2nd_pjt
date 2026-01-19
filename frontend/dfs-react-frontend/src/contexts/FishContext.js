@@ -49,7 +49,7 @@ export const FishProvider = ( { children } ) => {
                 }
             } );
 
-            console.log( '💓 하트비트 전송 성공' );
+            // console.log( '💓 하트비트 전송 성공' );
         } catch ( error ) {
             console.error( '� 하트비트 전송 실패:', error );
         }

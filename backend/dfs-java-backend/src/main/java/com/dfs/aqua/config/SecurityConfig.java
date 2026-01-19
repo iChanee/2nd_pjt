@@ -37,13 +37,14 @@ public class SecurityConfig {
 
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:3000", "http://127.0.0.1:3000",
-                "http://dfs-prd-pub-alb-1550490073.ap-northeast-2.elb.amazonaws.com",
-                "https://dfs-prd-pub-alb-1550490073.ap-northeast-2.elb.amazonaws.com",
-                "http://DFS-DEV-PUB-ALB-460529174.ap-northeast-2.elb.amazonaws.com",
-                "https://DFS-DEV-PUB-ALB-460529174.ap-northeast-2.elb.amazonaws.com",
+                "http://DFS-PRD-PUB-ALB-1935043920.ap-northeast-2.elb.amazonaws.com",
+                "https://DFS-PRD-PUB-ALB-1935043920.ap-northeast-2.elb.amazonaws.com",
+                "http://DFS-DEV-PUB-ALB-945432201.ap-northeast-2.elb.amazonaws.com",
+                "https://DFS-DEV-PUB-ALB-945432201.ap-northeast-2.elb.amazonaws.com",
                 "https://fish.yujeong91.shop",
                 "https://dev-fish.yujeong91.shop",
-                "https://api.yujeong91.shop"
+                "https://fish-api.yujeong91.shop",
+                "https://dev-fish-api.yujeong91.shop"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));

@@ -28,7 +28,8 @@ public class AuthService {
     // 허용된 물고기 타입 목록 (프론트엔드와 동일)
     private static final List<String> VALID_FISH_TYPES = Arrays.asList(
         "goldfish", "tropical", "shark", "whale", "octopus", "crab",
-        "seal", "pufferfish", "crocodile", "coral", "frog", "shell"
+        "seal", "pufferfish", "crocodile", "coral", "frog", "shell", 
+        "jellyfish", "shrimp","otter","turtle"
     );
 
     /**

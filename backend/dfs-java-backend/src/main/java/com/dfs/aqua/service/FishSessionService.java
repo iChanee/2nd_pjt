@@ -140,12 +140,6 @@ public class FishSessionService {
             LocalDateTime now = LocalDateTime.now();
             session.setLastActivityAt(now);
             fishSessionRepository.save(session);
-            
-            // 디버그 로그 추가
-            System.out.println("💓 하트비트 업데이트: " + session.getUser().getName() + 
-                             " (sessionToken: " + sessionToken + ", time: " + now + ")");
-        } else {
-            System.out.println("⚠️ 오프라인 세션에 하트비트 시도: " + sessionToken);
         }
     }
 

@@ -11,7 +11,11 @@ export const FISH_TYPES = {
     CROCODILE: 'crocodile',
     CORAL: 'coral',
     FROG: 'frog',
-    SHELL: 'shell'
+    SHELL: 'shell',
+    JELLYFISH: 'jellyfish',
+    SHRIMP: 'shrimp',
+    OTTER: 'otter',
+    TURTLE: 'turtle'
 };
 
 // 기본 물고기 정보
@@ -87,6 +91,30 @@ const FISH_INFO = {
         emoji: '🐚',
         speed: 0.4,
         size: 'small'
+    },
+    [ FISH_TYPES.JELLYFISH ]: {
+        label: '해파리',
+        emoji: '🪼',
+        speed: 3.6,
+        size: 'medium'
+    },
+    [ FISH_TYPES.SHRIMP ]: {
+        label: '새우',
+        emoji: '🦐',
+        speed: 5.2,
+        size: 'small'
+    },
+    [ FISH_TYPES.OTTER ]: {
+        label: '해달',
+        emoji: '🦦',
+        speed: 1.4,
+        size: 'large'
+    },
+    [ FISH_TYPES.TURTLE ]: {
+        label: '거북이',
+        emoji: '🐢',
+        speed: 0.5,
+        size: 'medium'
     }
 };
 
@@ -112,6 +140,7 @@ export const getSpeedText = ( speed ) => {
     if ( speed <= 0.8 ) return '느림';
     if ( speed <= 1.2 ) return '보통';
     if ( speed <= 1.5 ) return '빠름';
+    if ( speed <= 10.0 ) return '매우 빠름';
     return '매우 빠름';
 };
 

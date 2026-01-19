@@ -4,7 +4,7 @@ AWS EC2 환경에서 3Tier 통신을 통한 웹서비스 개발 구현
 ## local 실행 명령어
 ### backend
 ```
-$ gradlew bootRun -Dspring.profiles.active=local
+$ gradlew bootRun --args="--spring.profiles.active=local"
 ```
 
 ### frontend

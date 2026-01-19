@@ -13,6 +13,25 @@ const FishTank = () => {
     const [ chatMessage, setChatMessage ] = useState( '' );
     const [ foodParticles, setFoodParticles ] = useState( [] ); // 먹이 파티클 상태
     const [ processedMessageIds, setProcessedMessageIds ] = useState( new Set() ); // 처리된 메시지 ID 추적
+    const [ viewportHeight, setViewportHeight ] = useState( window.innerHeight ); // 뷰포트 높이 상태
+
+    // 뷰포트 높이 변경 감지 (모바일 브라우저 UI 변화 대응)
+    useEffect( () => {
+        const updateViewportHeight = () => {
+            setViewportHeight( window.innerHeight );
+        };
+
+        window.addEventListener( 'resize', updateViewportHeight );
+        window.addEventListener( 'orientationchange', updateViewportHeight );
+
+        // 초기 설정
+        updateViewportHeight();
+
+        return () => {
+            window.removeEventListener( 'resize', updateViewportHeight );
+            window.removeEventListener( 'orientationchange', updateViewportHeight );
+        };
+    }, [] );
 
     // 채팅 메시지를 물고기 말풍선으로 표시 (중복 처리 방지)
     useEffect( () => {
@@ -33,7 +52,7 @@ const FishTank = () => {
                 // 처리된 메시지 ID 추가
                 setProcessedMessageIds( prev => new Set( prev ).add( latestMessage.id ) );
             } else {
-              
+
                 // 물고기 데이터를 다시 가져와서 매칭 재시도
                 setTimeout( () => {
                     const retryFish = fishes.find( fish => fish.userId === latestMessage.userId );
@@ -131,12 +150,13 @@ const FishTank = () => {
 
     return (
         <div
-            className="relative w-full"
+            className="relative w-full mobile-viewport"
             style={{
-                height: '100vh', // 전체 화면 높이 사용
-                minHeight: '100vh',
+                height: `${ viewportHeight }px`, // 동적으로 계산된 뷰포트 높이 사용
+                minHeight: `${ viewportHeight }px`,
                 marginTop: '-60px', // nav 높이만큼 위로 올림
                 paddingTop: '60px', // 내용은 nav 아래부터 시작
+                paddingBottom: '120px', // 하단 여백을 더 크게 (채팅창 + 여유 공간)
                 overflow: 'hidden'
             }}
         >
@@ -156,7 +176,7 @@ const FishTank = () => {
                 {foodParticles.map( particle => (
                     <div
                         key={particle.id}
-                        className={`absolute w-3 h-3 ${ particle.color.bg } rounded-full shadow-lg`}
+                        className={`absolute w-2 h-2 sm:w-3 sm:h-3 ${ particle.color.bg } rounded-full shadow-lg`}
                         style={{
                             left: `${ particle.x }%`,
                             top: `${ particle.y }px`,
@@ -179,7 +199,7 @@ const FishTank = () => {
                     >
                         {/* 새 애니메이션 */}
                         <div
-                            className="absolute text-8xl"
+                            className="absolute text-4xl sm:text-6xl lg:text-8xl"
                             style={{
                                 animation: 'bird-catch 2s ease-in-out forwards',
                                 zIndex: 60
@@ -190,7 +210,7 @@ const FishTank = () => {
 
                         {/* 물고기 잡히는 애니메이션 */}
                         <div
-                            className="absolute text-7xl"
+                            className="absolute text-3xl sm:text-5xl lg:text-7xl"
                             style={{
                                 animation: 'fish-caught 2s ease-in-out forwards',
                                 zIndex: 55
@@ -203,11 +223,11 @@ const FishTank = () => {
 
                 {/* 물고기가 없을 때 메시지 */}
                 {fishes.length === 0 && !isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center text-white bg-black bg-opacity-50 p-6 rounded-lg">
-                            <div className="text-4xl mb-4">🌊</div>
-                            <h3 className="text-xl font-bold mb-2">텅 빈 어항</h3>
-                            <p className="text-gray-300">
+                    <div className="absolute inset-0 flex items-center justify-center px-4">
+                        <div className="text-center text-white bg-black bg-opacity-50 p-4 sm:p-6 rounded-lg max-w-sm sm:max-w-md">
+                            <div className="text-2xl sm:text-4xl mb-2 sm:mb-4">🌊</div>
+                            <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2">텅 빈 어항</h3>
+                            <p className="text-sm sm:text-base text-gray-300">
                                 로그인하여 물고기가 되어 어항에 참여해보세요!
                             </p>
                         </div>
@@ -216,11 +236,11 @@ const FishTank = () => {
 
                 {/* 로딩 상태 */}
                 {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center text-white bg-black bg-opacity-50 p-6 rounded-lg">
-                            <div className="text-4xl mb-4 animate-spin">🐠</div>
-                            <h3 className="text-xl font-bold mb-2">어항 로딩 중...</h3>
-                            <p className="text-gray-300">
+                    <div className="absolute inset-0 flex items-center justify-center px-4">
+                        <div className="text-center text-white bg-black bg-opacity-50 p-4 sm:p-6 rounded-lg max-w-sm sm:max-w-md">
+                            <div className="text-2xl sm:text-4xl mb-2 sm:mb-4 animate-spin">🐠</div>
+                            <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2">어항 로딩 중...</h3>
+                            <p className="text-sm sm:text-base text-gray-300">
                                 물고기들을 불러오고 있습니다
                             </p>
                         </div>
@@ -232,7 +252,7 @@ const FishTank = () => {
                     {[ ...Array( 5 ) ].map( ( _, i ) => (
                         <div
                             key={i}
-                            className="absolute w-2 h-2 bg-white bg-opacity-30 rounded-full animate-ping"
+                            className="absolute w-1 h-1 sm:w-2 sm:h-2 bg-white bg-opacity-30 rounded-full animate-ping"
                             style={{
                                 left: `${ 20 + i * 15 }%`,
                                 bottom: '10px',
@@ -244,30 +264,41 @@ const FishTank = () => {
                 </div>
             </OceanBackground>
 
-            {/* 채팅 입력창 - 항상 표시 */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md px-4" style={{ zIndex: 1000 }}>
-                <form onSubmit={handleSendMessage} className="flex space-x-2">
+            {/* 채팅 입력창 - 모바일 최적화 강화 */}
+            <div
+                className="fixed left-1/2 transform -translate-x-1/2 w-full max-w-xs sm:max-w-md lg:max-w-lg px-2 sm:px-4 mobile-chat-container"
+                style={{
+                    zIndex: 1000,
+                    bottom: '30px' // 하단에서 30px 위로
+                }}
+            >
+                <form onSubmit={handleSendMessage} className="flex space-x-1 sm:space-x-2">
                     <input
                         type="text"
                         value={chatMessage}
                         onChange={( e ) => setChatMessage( e.target.value )}
                         placeholder={isAuthenticated ? "물고기 말풍선으로 채팅해보세요... 💬" : "로그인 후 채팅 가능"}
                         disabled={!isAuthenticated}
-                        className="flex-1 px-4 py-3 bg-white border-2 border-blue-400 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed shadow-lg text-sm"
+                        className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-white border-2 border-blue-400 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed shadow-lg text-xs sm:text-sm"
+                        style={{ fontSize: '16px' }} // iOS 줌 방지
                     />
                     <button
                         type="submit"
                         disabled={!chatMessage.trim() || !isAuthenticated}
-                        className="px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-full transition-colors font-medium shadow-lg"
+                        className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-full transition-colors font-medium shadow-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
                     >
                         💬
                     </button>
                 </form>
 
-                {/* 상태 표시 */}
-                <div className="text-xs text-center mt-2 bg-black bg-opacity-70 text-white rounded px-2 py-1">
+                {/* 상태 표시 - 모바일에서 더 간결하게 */}
+                <div className="text-xs text-center mt-1 sm:mt-2 bg-black bg-opacity-70 text-white rounded px-2 py-1">
                     {isAuthenticated ? (
-                        <span>✅ {user?.name}님 로그인됨 | 🐠 {fishes.length}마리 헤엄치는 중</span>
+                        <span className="block sm:inline">
+                            <span className="hidden sm:inline">✅ {user?.name}님 로그인됨 | </span>
+                            <span className="sm:hidden">✅ {user?.name} | </span>
+                            🐠 {fishes.length}마리 헤엄치는 중
+                        </span>
                     ) : (
                         <span>❌ 로그인이 필요합니다</span>
                     )}

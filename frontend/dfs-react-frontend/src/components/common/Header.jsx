@@ -30,24 +30,24 @@ const Header = () => {
 
     return (
         <header className="bg-blue-600 text-white shadow-lg">
-            <div className="container mx-auto px-4 py-3">
+            <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3">
                 <div className="flex justify-between items-center">
                     {/* 왼쪽: 로고 및 웰컴 메시지 */}
-                    <div className="flex items-center space-x-6">
-                        <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2 sm:space-x-6">
+                        <div className="flex items-center space-x-2 sm:space-x-3">
                             {/* 원양어선 정보 아이콘 (hover 시 정보 표시) */}
                             {isAuthenticated && (
                                 <div className="relative group">
-                                    <div className="cursor-pointer text-blue-200 hover:text-white transition-colors">
+                                    <div className="cursor-pointer text-blue-200 hover:text-white transition-colors text-lg sm:text-base">
                                         🐠
                                     </div>
 
-                                    {/* Hover 시 나타나는 정보 패널 */}
-                                    <div className="absolute top-full left-0 mt-2 bg-black bg-opacity-90 text-white p-4 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-50 min-w-64">
-                                        <h3 className="text-lg font-bold mb-2 flex items-center">
+                                    {/* Hover 시 나타나는 정보 패널 - 반응형 개선 */}
+                                    <div className="absolute top-full left-0 mt-2 bg-black bg-opacity-90 text-white p-3 sm:p-4 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-50 min-w-48 sm:min-w-64 max-w-xs">
+                                        <h3 className="text-base sm:text-lg font-bold mb-2 flex items-center">
                                             🐠 원양어선 정보
                                         </h3>
-                                        <p className="text-sm mb-2">현재 물고기: <span className="font-bold text-blue-300">{fishes.length}마리</span></p>
+                                        <p className="text-xs sm:text-sm mb-2">현재 물고기: <span className="font-bold text-blue-300">{fishes.length}마리</span></p>
                                         <p className="text-xs text-gray-300 mb-3">
                                             실시간으로 접속자들이 물고기가 되어 헤엄치고 있어요!
                                         </p>
@@ -55,16 +55,18 @@ const Header = () => {
                                         {/* 물고기 목록 */}
                                         <div className="text-xs text-yellow-300">
                                             <div className="font-semibold mb-1">🐟 현재 접속 중:</div>
-                                            {fishes.length > 0 ? (
-                                                fishes.map( fish => (
-                                                    <div key={fish.id} className="flex items-center space-x-1 mb-1">
-                                                        <span>{fish.name}</span>
-                                                        <span className="text-gray-400">({fish.type})</span>
-                                                    </div>
-                                                ) )
-                                            ) : (
-                                                <div className="text-gray-400">접속 중인 물고기가 없습니다</div>
-                                            )}
+                                            <div className="max-h-24 overflow-y-auto">
+                                                {fishes.length > 0 ? (
+                                                    fishes.map( fish => (
+                                                        <div key={fish.id} className="flex items-center space-x-1 mb-1">
+                                                            <span className="truncate">{fish.name}</span>
+                                                            <span className="text-gray-400 text-xs">({fish.type})</span>
+                                                        </div>
+                                                    ) )
+                                                ) : (
+                                                    <div className="text-gray-400">접속 중인 물고기가 없습니다</div>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {/* 개발용 정리 버튼 */}
@@ -81,14 +83,12 @@ const Header = () => {
                                     </div>
                                 </div>
                             )}
-                            <Link to="/" className="text-2xl font-bold flex items-center hover:text-blue-200 transition-colors">
+                            <Link to="/" className="text-lg sm:text-2xl font-bold flex items-center hover:text-blue-200 transition-colors">
                                 원양어선
                             </Link>
-
-
                         </div>
 
-                        <div className="hidden md:block text-blue-200 text-sm">
+                        <div className="hidden lg:block text-blue-200 text-sm">
                             어항 속 물고기들의 세상에 오신 것을 환영합니다! 🌊
                         </div>
                     </div>
@@ -96,15 +96,16 @@ const Header = () => {
                     {/* 오른쪽: 로그인된 사용자 정보만 표시 */}
                     <div className="flex items-center">
                         {isAuthenticated ? (
-                            <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-1 sm:space-x-4">
                                 <button
                                     onClick={feedFish}
-                                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full text-sm font-medium transition-colors flex items-center space-x-1"
+                                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium transition-colors flex items-center space-x-1 min-w-[44px] min-h-[44px] sm:min-w-auto sm:min-h-auto"
                                     title="물고기들에게 먹이주기"
                                 >
                                     <span>🍤</span>
-                                    <span>먹이주기</span>
+                                    <span className="hidden sm:inline">먹이주기</span>
                                 </button>
+
                                 <nav className="hidden md:flex items-center space-x-4 mr-4">
                                     <Link
                                         to="/"
@@ -120,15 +121,19 @@ const Header = () => {
                                     </Link>
                                 </nav>
 
-                                <div className="flex items-center space-x-3">
-                                    <span className="text-blue-200 text-sm">
+                                <div className="flex items-center space-x-1 sm:space-x-3">
+                                    <span className="text-blue-200 text-xs sm:text-sm hidden sm:block">
                                         안녕하세요, <span className="font-medium text-white">{user?.name || user?.email}</span>님! 🐟
+                                    </span>
+                                    <span className="text-blue-200 text-xs sm:hidden">
+                                        {user?.name || user?.email} 🐟
                                     </span>
                                     <button
                                         onClick={handleLogout}
-                                        className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-md transition-colors font-medium text-sm"
+                                        className="bg-blue-700 hover:bg-blue-800 px-2 sm:px-4 py-1 sm:py-2 rounded-md transition-colors font-medium text-xs sm:text-sm min-w-[44px] min-h-[44px] sm:min-w-auto sm:min-h-auto"
                                     >
-                                        로그아웃
+                                        <span className="sm:hidden">🚪</span>
+                                        <span className="hidden sm:inline">로그아웃</span>
                                     </button>
                                 </div>
                             </div>
@@ -141,17 +146,17 @@ const Header = () => {
 
                 {/* 모바일 네비게이션 (로그인된 경우만) */}
                 {isAuthenticated && (
-                    <div className="md:hidden mt-3 pt-3 border-t border-blue-500">
+                    <div className="md:hidden mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-blue-500">
                         <nav className="flex space-x-4">
                             <Link
                                 to="/"
-                                className="hover:text-blue-200 transition-colors text-sm"
+                                className="hover:text-blue-200 transition-colors text-sm min-w-[44px] min-h-[44px] flex items-center"
                             >
                                 어항
                             </Link>
                             <Link
                                 to="/mypage"
-                                className="hover:text-blue-200 transition-colors text-sm"
+                                className="hover:text-blue-200 transition-colors text-sm min-w-[44px] min-h-[44px] flex items-center"
                             >
                                 마이페이지
                             </Link>

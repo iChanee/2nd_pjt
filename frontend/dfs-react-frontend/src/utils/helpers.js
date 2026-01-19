@@ -105,6 +105,48 @@ export const calculateRandomMovement = ( fishType ) => {
                 baseMovement.y = Math.abs( baseMovement.y );
             }
             break;
+        case 'jellyfish':
+            // 해파리는 위아래로 부드럽게 떠다니는 움직임
+            baseMovement.x *= 0.6;
+            baseMovement.y *= 1.8;
+            // 위아래 움직임이 더 부드럽게
+            if ( Math.random() < 0.6 ) {
+                baseMovement.y *= ( Math.random() < 0.5 ? 1 : -1 );
+            }
+            break;
+        case 'shrimp':
+            // 새우는 빠르고 튀는 듯한 움직임
+            baseMovement.x *= 1.8;
+            baseMovement.y *= 1.5;
+            // 가끔 급격한 방향 전환 (30% 확률)
+            if ( Math.random() < 0.3 ) {
+                baseMovement.x *= -2.0;
+                baseMovement.y *= 1.5;
+            }
+            break;
+        case 'otter':
+            // 해달은 활발하고 장난스러운 움직임
+            baseMovement.x *= 1.4;
+            baseMovement.y *= 1.7;
+            // 가끔 회전하듯 움직임 (25% 확률)
+            if ( Math.random() < 0.25 ) {
+                baseMovement.x *= 1.5;
+                baseMovement.y *= -1.2;
+            }
+            break;
+        case 'turtle':
+            // 거북이는 매우 느리고 꾸준한 움직임
+            baseMovement.x *= 0.5;
+            baseMovement.y *= 0.6;
+            // 직선적인 움직임 선호 (70% 확률)
+            if ( Math.random() < 0.7 ) {
+                if ( Math.abs( baseMovement.x ) > Math.abs( baseMovement.y ) ) {
+                    baseMovement.y *= 0.3;
+                } else {
+                    baseMovement.x *= 0.3;
+                }
+            }
+            break;
         default:
             // 금붕어는 기본 움직임
             baseMovement.x *= 1.0;
