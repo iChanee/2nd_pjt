@@ -8,8 +8,8 @@ const Fish = ( { fish } ) => {
 
     // 완전히 독립적인 위치 관리 (px 기반)
     const [ position, setPosition ] = useState( {
-        x: Math.random() * 80 + 10, // % 기반 (X축)
-        y: Math.random() * 400 + 100 // px 기반 (Y축)
+        x: Math.random() * 90 + 5, // % 기반 (X축) - 범위 확장: 5% ~ 95%
+        y: Math.random() * 600 + 80 // px 기반 (Y축) - 범위 확장: 80px ~ 680px
     } );
     const [ direction, setDirection ] = useState( 1 );
     const [ isDragging, setIsDragging ] = useState( false );
@@ -80,7 +80,7 @@ const Fish = ( { fish } ) => {
         const newY = ( ( clientY - dragOffset.y - containerRect.top ) / containerRect.height ) * 100;
 
         const clampedPosition = {
-            x: Math.max( 0, Math.min( 100, newX ) ),
+            x: Math.max( 0, Math.min( 100, newX ) ), // 드래그 시에는 전체 화면 사용 가능
             y: Math.max( 0, Math.min( 100, newY ) )
         };
 
@@ -139,8 +139,8 @@ const Fish = ( { fish } ) => {
                 };
 
                 const newPosition = {
-                    x: Math.max( 5, Math.min( 95, prev.x + personalizedMovement.x ) ), // % 기반 (X축)
-                    y: Math.max( 50, Math.min( 500, prev.y + personalizedMovement.y * 20 ) ) // px 기반 (Y축, 움직임 증폭)
+                    x: Math.max( 2, Math.min( 98, prev.x + personalizedMovement.x ) ), // % 기반 (X축) - 범위 확장: 2% ~ 98%
+                    y: Math.max( 80, Math.min( 680, prev.y + personalizedMovement.y * 20 ) ) // px 기반 (Y축) - 범위 확장
                 };
 
                 // 방향 결정

@@ -37,14 +37,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:3000", "http://127.0.0.1:3000",
-                "http://DFS-PRD-PUB-ALB-1935043920.ap-northeast-2.elb.amazonaws.com",
-                "https://DFS-PRD-PUB-ALB-1935043920.ap-northeast-2.elb.amazonaws.com",
-                "http://DFS-DEV-PUB-ALB-945432201.ap-northeast-2.elb.amazonaws.com",
-                "https://DFS-DEV-PUB-ALB-945432201.ap-northeast-2.elb.amazonaws.com",
-                "https://fish.yujeong91.shop",
-                "https://dev-fish.yujeong91.shop",
-                "https://fish-api.yujeong91.shop",
-                "https://dev-fish-api.yujeong91.shop"
+                "https://bearsnack.store"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
@@ -71,8 +64,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/aquarium/fishes").permitAll()
                         .requestMatchers("/api/aquarium/status").permitAll()
+                        .requestMatchers("/api/aquarium/cleanup").permitAll()  // sendBeacon용
+                        .requestMatchers("/api/aquarium/cleanup-sessions").permitAll()  // 테스트용
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/error").permitAll()
+                        // Swagger UI 경로 허용
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
