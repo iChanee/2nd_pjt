@@ -37,7 +37,9 @@ public class SecurityConfig {
 
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:3000", "http://127.0.0.1:3000",
-                "https://bearsnack.store"
+                "https://bearsnack.store",
+                "https://fish.yujeong91.shop",
+                "https://ichane.store"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
@@ -66,8 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/aquarium/status").permitAll()
                         .requestMatchers("/api/aquarium/cleanup").permitAll()  // sendBeacon용
                         .requestMatchers("/api/aquarium/cleanup-sessions").permitAll()  // 테스트용
-                        .requestMatchers("/api/health").permitAll()
-                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/health/**").permitAll()  // health 하위 모든 경로 허용
                         // Swagger UI 경로 허용
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()

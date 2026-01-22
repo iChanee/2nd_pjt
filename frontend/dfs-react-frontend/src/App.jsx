@@ -5,7 +5,6 @@ import { FishProvider } from './contexts/FishContext';
 import { ChatProvider } from './contexts/ChatContext';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
-import Login from './pages/Login';
 import Register from './pages/Register';
 import MyPage from './pages/MyPage';
 
@@ -29,7 +28,11 @@ function App() {
               } />
 
               {/* 로그인 및 회원가입은 별도 페이지 */}
-              <Route path="/login" element={<Login />} />
+              <Route path="/login" element={
+                <MainLayout>
+                  <Home />
+                </MainLayout>
+              } />
               <Route path="/register" element={<Register />} />
             </Routes>
           </Router>

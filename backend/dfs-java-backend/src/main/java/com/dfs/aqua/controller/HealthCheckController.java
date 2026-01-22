@@ -17,6 +17,17 @@ public class HealthCheckController {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "OK");
         response.put("code", "200");
+        System.out.println(response);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<Map<String, Object>> rollingAndRollbackTest() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "OK");
+        response.put("code", "200");
+        response.put("message", "rolling update + rollback test version 5");
+        System.out.println(response);
         return ResponseEntity.ok(response);
     }
 }
